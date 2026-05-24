@@ -1,0 +1,9 @@
+{
+  "name": "farmManager",
+  "version": "1.0.0",
+  "description": "农场管理云函数：CRUD + 活跃农场切换",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "^3.0.4"
+  }
+}

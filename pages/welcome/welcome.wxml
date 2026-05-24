@@ -1,0 +1,38 @@
+<view class="container">
+  <!-- Background decoration -->
+  <view class="bg-decoration">
+    <view class="blur-circle blur-circle-1"></view>
+    <view class="blur-circle blur-circle-2"></view>
+  </view>
+
+  <view class="content">
+    <!-- Brand icon -->
+    <view class="brand-icon-wrapper">
+      <view class="brand-icon">🚜</view>
+    </view>
+
+    <!-- Typography -->
+    <view class="title-section">
+      <text class="headline">欢迎，\n农户！</text>
+      <text class="subtitle">本季种植玉米吗？</text>
+    </view>
+
+    <!-- Action buttons -->
+    <view class="action-area">
+      <view class="btn-yes" bindtap="onYesTap">
+        <view class="btn-yes-icon">🌱</view>
+        <text class="btn-yes-text">是的，开始种植</text>
+      </view>
+      <view class="btn-no" bindtap="onNoTap">
+        <view class="btn-no-icon">🚫</view>
+        <text class="btn-no-text">不是，本季不种</text>
+      </view>
+    </view>
+
+    <!-- Footer -->
+    <view class="footer">
+      <text class="footer-icon">ℹ️</text>
+      <text class="footer-text">稍后可以在设置中修改。</text>
+    </view>
+  </view>
+</view>

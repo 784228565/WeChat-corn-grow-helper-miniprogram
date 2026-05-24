@@ -1,0 +1,218 @@
+/* Setup Page Styles - Matching _3/screen.png */
+.container {
+  min-height: 100vh;
+  background-color: var(--surface);
+  padding-bottom: 64rpx;
+}
+
+.content {
+  padding: 48rpx 48rpx 0;
+}
+
+/* Header image */
+.header-image-wrapper {
+  width: 100%;
+  height: 240rpx;
+  border-radius: 32rpx;
+  overflow: hidden;
+  margin-bottom: 64rpx;
+  box-shadow: 0 8rpx 32rpx rgba(21, 66, 18, 0.08);
+}
+
+.header-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Title */
+.title-section {
+  margin-bottom: 80rpx;
+}
+
+.headline {
+  display: block;
+  font-size: 56rpx;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.15;
+  margin-bottom: 24rpx;
+}
+
+.subtitle {
+  display: block;
+  font-size: 30rpx;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+  max-width: 85%;
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 48rpx;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.label {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 4rpx;
+  margin-left: 8rpx;
+}
+
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.label-locked {
+  font-size: 20rpx;
+  color: var(--secondary);
+  font-weight: 600;
+  background-color: var(--primary-fixed);
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.input {
+  position: relative;
+  z-index: 1;
+  background-color: var(--surface-container-low);
+  border-radius: 16rpx;
+  padding: 32rpx 40rpx;
+  font-size: 34rpx;
+  color: var(--on-surface);
+  caret-color: var(--secondary);
+}
+
+.input:focus {
+  box-shadow: 0 4rpx 0 0 var(--secondary);
+}
+
+.input-locked {
+  background-color: var(--surface-container-high);
+  color: var(--on-surface-variant);
+  opacity: 0.85;
+}
+
+.placeholder {
+  color: var(--outline-variant);
+}
+
+/* Input with icon */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--surface-container-low);
+  border-radius: 16rpx;
+}
+
+.input-icon {
+  position: absolute;
+  left: 32rpx;
+  font-size: 32rpx;
+  z-index: 1;
+}
+
+.input-indent {
+  padding-left: 88rpx;
+  width: 100%;
+  background: transparent;
+}
+
+/* Input with suffix */
+.input-with-suffix {
+  display: flex;
+  align-items: center;
+  background-color: var(--surface-container-low);
+  border-radius: 16rpx;
+  padding-right: 32rpx;
+}
+
+.input-flex {
+  flex: 1;
+  background: transparent;
+}
+
+.input-suffix {
+  font-size: 28rpx;
+  color: var(--on-surface-variant);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Select / Picker */
+.select-wrapper {
+  background-color: var(--surface-container-low);
+  border-radius: 16rpx;
+}
+
+.picker {
+  padding: 32rpx 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.picker-text {
+  font-size: 34rpx;
+}
+
+.picker-placeholder {
+  color: var(--outline-variant);
+}
+
+.picker-arrow {
+  font-size: 40rpx;
+  color: var(--outline);
+}
+
+/* Action buttons */
+.action-row {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 32rpx;
+}
+
+.btn-submit {
+  flex: 1;
+  background: linear-gradient(135deg, var(--secondary), var(--secondary-fixed-dim));
+  color: var(--on-secondary);
+  border-radius: 32rpx;
+  padding: 40rpx 32rpx;
+  font-size: 36rpx;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 8rpx 32rpx rgba(55, 107, 16, 0.15);
+}
+
+.btn-submit:active {
+  box-shadow: 0 12rpx 40rpx rgba(55, 107, 16, 0.25);
+}
+
+.btn-outline {
+  flex: 1;
+  background-color: transparent;
+  color: var(--secondary);
+  border-radius: 32rpx;
+  padding: 40rpx 32rpx;
+  font-size: 36rpx;
+  font-weight: 700;
+  border: 4rpx solid var(--secondary);
+}
+
+.btn-outline:active {
+  background-color: var(--surface-container-low);
+}
+

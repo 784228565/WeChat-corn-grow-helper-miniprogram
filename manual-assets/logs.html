@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1.0">
+<title>打卡记录页</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fbf9f5;display:flex;justify-content:center;padding:20px}
+.phone{width:390px;height:844px;background:#fbf9f5;border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,0.15);overflow:hidden;position:relative}
+.container{min-height:100%;background:#fbf9f5;padding-bottom:100px;overflow-y:auto}
+.app-bar{display:flex;justify-content:space-between;align-items:center;padding:24px 16px 12px;background:#fbf9f5}
+.app-bar-left{display:flex;align-items:center}
+.avatar{width:40px;height:40px;border-radius:50%;background:#eae8e4;display:flex;align-items:center;justify-content:center;font-size:20px}
+.app-title{font-size:16px;font-weight:900;color:#154212;letter-spacing:1px;text-align:center;flex:1}
+.app-bar-right{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.content{padding:16px}
+.page-header{margin-bottom:32px;padding-left:8px;border-left:4px solid #9bd771}
+.page-title{display:block;font-size:28px;font-weight:700;color:#154212;line-height:1.15}
+.page-subtitle{display:block;font-size:15px;color:#42493e;margin-top:8px}
+.logs-list{display:flex;flex-direction:column;gap:24px}
+.log-card{background:#f5f3ef;border-radius:16px;padding:24px;box-shadow:0 4px 16px rgba(21,66,18,0.04);position:relative;overflow:hidden}
+.log-decoration{position:absolute;top:0;right:0;width:128px;height:128px;background:#bcf0ae;opacity:0.2;border-bottom-left-radius:100%;margin-right:-32px;margin-top:-32px}
+.log-content{position:relative;z-index:1}
+.log-main{display:flex;flex-direction:column;gap:16px}
+.log-meta{display:flex;flex-direction:column;gap:8px}
+.stage-badge{display:inline-flex;align-self:flex-start;background:#bcf0ae;border-radius:9999px;padding:6px 16px}
+.stage-badge-text{font-size:12px;font-weight:700;color:#154212;text-transform:uppercase;letter-spacing:2px}
+.log-date{display:flex;align-items:center;gap:6px;margin-top:4px}
+.date-text{font-size:13px;color:#42493e}
+.log-summary{display:flex;flex-direction:column;gap:4px}
+.summary-text{font-size:14px;color:#1b1c1a}
+.summary-location{font-size:12px;color:#72796e}
+.log-thumbnail{width:100%;height:160px;border-radius:16px;background:#efeeea;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.thumb-img{width:100%;height:100%;object-fit:cover}
+.load-more{text-align:center;padding:16px}
+.load-more-text{font-size:14px;color:#376B10;font-weight:600}
+.bottom-nav{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);width:90%;max-width:320px;border-radius:9999px;display:flex;justify-content:space-around;align-items:center;padding:8px;box-shadow:0 4px 16px rgba(21,66,18,0.08);z-index:50;background:rgba(255,255,255,0.7);backdrop-filter:blur(20px)}
+.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 16px;border-radius:9999px;opacity:0.6}
+.nav-item:nth-child(2){background:#2d5a27;opacity:1}
+.nav-icon{font-size:20px;margin-bottom:4px}
+.nav-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#154212}
+.nav-item:nth-child(2) .nav-label{color:#b6f48a}
+</style>
+</head>
+<body>
+<div class="phone">
+<div class="container">
+<div class="app-bar">
+<div class="app-bar-left"><div class="avatar">👤</div></div>
+<span class="app-title">农田管家</span>
+<div class="app-bar-right">🔔</div>
+</div>
+<div class="content">
+<div class="page-header">
+<span class="page-title">打卡记录</span>
+<span class="page-subtitle">您的种植管理历史记录。</span>
+</div>
+<div class="logs-list">
+<div class="log-card">
+<div class="log-decoration"></div>
+<div class="log-content">
+<div class="log-main">
+<div class="log-meta">
+<div class="stage-badge"><span class="stage-badge-text">V6 - 拔节期</span></div>
+<div class="log-date"><span>📅</span><span class="date-text">5月10日 2026年</span></div>
+</div>
+<div class="log-summary">
+<span class="summary-text">已完成 4/4 项任务</span>
+<span class="summary-location">📍 内蒙古通辽市科尔沁区</span>
+</div>
+<div class="log-thumbnail">
+<div style="width:100%;height:100%;background:linear-gradient(135deg,#bcf0ae,#9bd771);display:flex;align-items:center;justify-content:center;font-size:48px">📷</div>
+</div>
+</div>
+</div>
+</div>
+<div class="log-card">
+<div class="log-decoration"></div>
+<div class="log-content">
+<div class="log-main">
+<div class="log-meta">
+<div class="stage-badge"><span class="stage-badge-text">V4 - 展开叶期</span></div>
+<div class="log-date"><span>📅</span><span class="date-text">4月25日 2026年</span></div>
+</div>
+<div class="log-summary">
+<span class="summary-text">已完成 3/3 项任务</span>
+<span class="summary-location">📍 内蒙古通辽市科尔沁区</span>
+</div>
+<div class="log-thumbnail">
+<div style="width:100%;height:100%;background:linear-gradient(135deg,#E3F2FD,#BBDEFB);display:flex;align-items:center;justify-content:center;font-size:48px">📷</div>
+</div>
+</div>
+</div>
+</div>
+<div class="log-card">
+<div class="log-decoration"></div>
+<div class="log-content">
+<div class="log-main">
+<div class="log-meta">
+<div class="stage-badge"><span class="stage-badge-text">V2 - 幼苗期</span></div>
+<div class="log-date"><span>📅</span><span class="date-text">4月10日 2026年</span></div>
+</div>
+<div class="log-summary">
+<span class="summary-text">已完成 2/2 项任务</span>
+<span class="summary-location">📍 内蒙古通辽市科尔沁区</span>
+</div>
+</div>
+</div>
+</div>
+<div class="load-more"><span class="load-more-text">加载更多</span></div>
+</div>
+</div>
+<div class="bottom-nav">
+<div class="nav-item"><span class="nav-icon">🚜</span><span class="nav-label">打卡</span></div>
+<div class="nav-item"><span class="nav-icon">⏱</span><span class="nav-label">记录</span></div>
+<div class="nav-item"><span class="nav-icon">🤖</span><span class="nav-label">AI助手</span></div>
+</div>
+</div>
+</div>
+</body>
+</html>

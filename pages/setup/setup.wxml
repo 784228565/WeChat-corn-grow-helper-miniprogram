@@ -1,0 +1,112 @@
+<view class="container">
+  <view class="content">
+    <!-- Header image -->
+    <view class="header-image-wrapper">
+      <image class="header-image" src="/images/seedling.jpg" mode="aspectFill" />
+    </view>
+
+    <!-- Title -->
+    <view class="title-section">
+      <text class="headline">告诉我们您的农场信息</text>
+      <text class="subtitle">建立基础信息，为您定制种植方案。</text>
+    </view>
+
+    <!-- Form -->
+    <view class="form">
+      <!-- Full Name -->
+      <view class="form-group">
+        <view class="label-row">
+          <text class="label">姓名</text>
+          <text class="label-locked" wx:if="{{contactLocked}}">已锁定</text>
+        </view>
+        <input wx:if="{{!contactLocked}}" class="input" placeholder="例如：张三" placeholder-class="placeholder" data-field="fullName" bindinput="onInputChange" value="{{fullName}}" />
+        <input wx:if="{{contactLocked}}" class="input input-locked" placeholder="例如：张三" placeholder-class="placeholder" data-field="fullName" bindinput="onInputChange" value="{{fullName}}" disabled />
+      </view>
+
+      <!-- Phone Number -->
+      <view class="form-group">
+        <view class="label-row">
+          <text class="label">电话号码</text>
+          <text class="label-locked" wx:if="{{contactLocked}}">已锁定</text>
+        </view>
+        <input wx:if="{{!contactLocked}}" class="input" placeholder="13800000000" placeholder-class="placeholder" type="number" data-field="phone" bindinput="onInputChange" value="{{phone}}" />
+        <input wx:if="{{contactLocked}}" class="input input-locked" placeholder="13800000000" placeholder-class="placeholder" type="number" data-field="phone" bindinput="onInputChange" value="{{phone}}" disabled />
+      </view>
+
+      <!-- Farm Location -->
+      <view class="form-group">
+        <text class="label">农场位置</text>
+        <view class="input-with-icon" bindtap="chooseLocation">
+          <text class="input-icon">📍</text>
+          <input class="input input-indent" placeholder="点击选择农场位置" placeholder-class="placeholder" value="{{location}}" disabled />
+        </view>
+      </view>
+
+      <!-- Accumulated Temperature -->
+      <view class="form-group">
+        <text class="label">积温</text>
+        <view class="input-with-suffix">
+          <input class="input input-flex" placeholder="2800" placeholder-class="placeholder" type="number" data-field="accumulatedTemp" bindinput="onInputChange" />
+          <text class="input-suffix">℃</text>
+        </view>
+      </view>
+
+      <!-- Soil Type -->
+      <view class="form-group">
+        <text class="label">土地类型</text>
+        <view class="select-wrapper">
+          <picker bindchange="bindSoilTypeChange" value="{{soilTypeIndex}}" range="{{soilTypes}}" range-key="label">
+            <view class="picker">
+              <text class="picker-text {{soilTypeIndex === -1 ? 'picker-placeholder' : ''}}">{{soilTypeIndex === -1 ? '选择土地类型...' : soilTypes[soilTypeIndex].label}}</text>
+              <text class="picker-arrow">⌄</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+
+      <!-- Irrigation Method -->
+      <view class="form-group">
+        <text class="label">灌溉方式</text>
+        <view class="select-wrapper">
+          <picker bindchange="bindIrrigationChange" value="{{irrigationIndex}}" range="{{irrigationMethods}}">
+            <view class="picker">
+              <text class="picker-text {{irrigationIndex === -1 ? 'picker-placeholder' : ''}}">{{irrigationIndex === -1 ? '选择灌溉方式...' : irrigationMethods[irrigationIndex]}}</text>
+              <text class="picker-arrow">⌄</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+
+      <!-- Planting Density -->
+      <view class="form-group">
+        <text class="label">种植密度</text>
+        <view class="input-with-suffix">
+          <input class="input input-flex" placeholder="6700" placeholder-class="placeholder" type="number" data-field="plantingDensity" bindinput="onInputChange" />
+          <text class="input-suffix">株/亩</text>
+        </view>
+      </view>
+
+      <!-- Seed Variety -->
+      <view class="form-group">
+        <text class="label">种子品种</text>
+        <view class="select-wrapper">
+          <picker bindchange="bindPickerChange" value="{{varietyIndex}}" range="{{varieties}}">
+            <view class="picker">
+              <text class="picker-text {{varietyIndex === -1 ? 'picker-placeholder' : ''}}">{{varietyIndex === -1 ? '选择主栽品种...' : varieties[varietyIndex]}}</text>
+              <text class="picker-arrow">⌄</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+
+      <!-- Row Spacing (hidden default) -->
+      <input style="display:none" data-field="rowSpacing" value="Standard" />
+
+      <!-- Action buttons -->
+      <view class="action-row">
+        <button class="btn-outline" bindtap="goBack">← 返回</button>
+        <button class="btn-submit" bindtap="onComplete" loading="{{submitting}}" disabled="{{submitting}}">{{submitting ? '创建中...' : '完成设置 →'}}</button>
+      </view>
+    </view>
+  </view>
+</view>

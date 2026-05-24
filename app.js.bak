@@ -1,0 +1,9 @@
+App({
+  onLaunch() {
+    console.log('The Living Ledger App Launch')
+  },
+  globalData: {
+    userInfo: null,
+    farmInfo: null
+  }
+})

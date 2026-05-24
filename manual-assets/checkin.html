@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1.0">
+<title>打卡主页</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fbf9f5;display:flex;justify-content:center;padding:20px}
+.phone{width:390px;height:844px;background:#fbf9f5;border-radius:40px;box-shadow:0 20px 60px rgba(0,0,0,0.15);overflow:hidden;position:relative}
+.container{min-height:100%;background:#fbf9f5;padding-bottom:100px;overflow-y:auto}
+.app-bar{display:flex;justify-content:space-between;align-items:center;padding:24px 16px 12px;background:#fbf9f5;position:sticky;top:0;z-index:70}
+.app-bar-left{display:flex;align-items:center;gap:12px}
+.avatar{width:40px;height:40px;border-radius:50%;background:#eae8e4;display:flex;align-items:center;justify-content:center;font-size:20px}
+.app-title{font-size:16px;font-weight:900;color:#154212;letter-spacing:1px}
+.app-bar-right{width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(21,66,18,0.04);font-size:18px}
+.content{padding:16px}
+.page-header{margin-bottom:24px}
+.page-title-group{margin-bottom:16px;padding-left:8px}
+.page-title{display:block;font-size:28px;font-weight:700;color:#154212;line-height:1.15;margin-bottom:6px}
+.progress-card{background:#fff;border-radius:8px;padding:16px;box-shadow:0 4px 16px rgba(21,66,18,0.04)}
+.progress-header{display:flex;justify-content:space-between;margin-bottom:8px}
+.progress-label,.progress-stage{font-size:13px;font-weight:600;color:#154212}
+.progress-bar-bg{width:100%;height:8px;background:#efeeea;border-radius:4px;overflow:hidden}
+.progress-bar-fill{height:100%;background:#376B10;border-radius:4px;width:35%}
+.timeline-scroll{width:100%;margin-bottom:4px;padding-left:8px;overflow-x:auto}
+.timeline{display:flex;align-items:center;gap:8px;min-width:max-content;padding:12px 0}
+.timeline-item{display:flex;flex-direction:column;align-items:center;gap:6px}
+.timeline-dot{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px}
+.completed-dot{background:#bcf0ae}.active-dot{width:64px;height:64px;background:#376B10;box-shadow:0 4px 16px rgba(55,107,16,0.2)}
+.upcoming-dot{background:#efeeea}.checkable-dot{background:#4CAF50;box-shadow:0 2px 8px rgba(76,175,80,0.3)}
+.timeline-check{font-size:20px;color:#fff;font-weight:700}
+.timeline-label{font-size:13px;font-weight:700}.completed-label{color:#154212}.active-label{color:#376B10}.upcoming-label{color:#42493e}.checkable-label{color:#4CAF50}
+.timeline-line{width:32px;height:4px;border-radius:2px}.completed-line{background:#bcf0ae}.upcoming-line{background:#eae8e4}
+.timeline-hint{display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:24px}
+.timeline-hint-text{font-size:11px;color:#42493e;opacity:0.55}
+.main-grid{display:flex;flex-direction:column;gap:24px}
+.stage-card{background:#fff;border-radius:16px;padding:32px;box-shadow:0 4px 16px rgba(21,66,18,0.06);position:relative;overflow:hidden}
+.stage-card::before{content:'';position:absolute;top:-80px;right:-80px;width:256px;height:256px;background:#b6f48a;border-radius:50%;opacity:0.2;filter:blur(40px)}
+.stage-card-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;position:relative;z-index:1}
+.stage-icon-wrapper{width:48px;height:48px;background:#bcf0ae;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stage-icon{font-size:24px}
+.stage-title{display:block;font-size:18px;font-weight:700;color:#154212}
+.stage-status-row{display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:2px}
+.stage-status-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:9999px;text-transform:uppercase;letter-spacing:1px}
+.stage-status-checkable{background:rgba(76,175,80,0.15);color:#2E7D32}
+.stage-date{font-size:11px;color:#42493e}
+.stage-subtitle{display:block;font-size:12px;color:#42493e;margin-top:4px}
+.plan-summary{background:linear-gradient(135deg,#FFF8E1,#FFECB3);border-radius:8px;padding:12px;margin-bottom:12px;border-left:3px solid #F57C00;position:relative;z-index:1}
+.plan-summary-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.plan-summary-title{font-size:15px;font-weight:700;color:#E65100}
+.plan-summary-body{display:flex;flex-direction:column;gap:6px}
+.plan-summary-row{display:flex;justify-content:space-between;align-items:center}
+.plan-summary-label{font-size:13px;color:#BF360C;font-weight:600}
+.plan-summary-value{font-size:13px;color:#E65100;font-weight:700;text-align:right;flex:1;margin-left:8px}
+.plan-summary-ref{margin-top:6px;padding-top:6px;border-top:1px dashed rgba(245,124,0,0.3);font-size:12px;color:#E65100;font-weight:500}
+.stage-description{background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border-radius:8px;padding:12px;margin-bottom:12px;border-left:3px solid #1976D2;display:flex;flex-direction:column;gap:6px;position:relative;z-index:1}
+.stage-desc-title{font-size:15px;font-weight:700;color:#0D47A1}
+.stage-desc-body{font-size:13px;color:#1565C0;line-height:1.6;font-weight:500}
+.stage-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:12px;position:relative;z-index:1}
+.btn-upload{background:#376B10;color:#fff;border-radius:8px;padding:12px 20px;display:flex;align-items:center;gap:8px;font-weight:700;box-shadow:0 2px 8px rgba(21,66,18,0.08);font-size:14px}
+.btn-video{background:#f5f3ef;color:#154212;border-radius:8px;padding:12px 20px;display:flex;align-items:center;gap:8px;font-weight:600;border:1px solid rgba(194,201,187,0.15);font-size:14px}
+.subscribe-row{margin-bottom:16px;display:flex;justify-content:center;position:relative;z-index:1}
+.btn-subscribe{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#E8F5E9,#C8E6C9);color:#376B10;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;border:2px solid #376B10;box-shadow:0 2px 8px rgba(55,107,16,0.08)}
+.tasks-card{background:#f5f3ef;border-radius:16px;padding:24px}
+.tasks-header{display:flex;align-items:center;gap:8px;margin-bottom:24px}
+.tasks-title{font-size:18px;font-weight:700;color:#154212}
+.task-list{display:flex;flex-direction:column}
+.task-item{display:flex;align-items:flex-start;gap:12px;padding:16px 0;border-bottom:1px solid rgba(219,218,214,0.3)}
+.task-item:last-child{border-bottom:none}
+.task-checkbox{width:24px;height:24px;border-radius:50%;border:2px solid #72796e;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.task-checkbox.checked{background:#376B10;border-color:#376B10}
+.task-checkmark{font-size:12px;color:#fff;font-weight:700}
+.task-content{flex:1}
+.task-name{display:block;font-size:15px;font-weight:600;color:#154212}
+.completed-name{text-decoration:line-through;opacity:0.7}
+.task-meta{display:block;font-size:12px;color:#42493e;margin-top:4px}
+.checkin-action{margin-top:24px;padding-top:16px;border-top:1px solid rgba(219,218,214,0.3)}
+.btn-checkin{background:linear-gradient(135deg,#376B10,#9bd771);color:#fff;border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;box-shadow:0 4px 16px rgba(55,107,16,0.15);font-size:16px}
+.insight-card{background:#fbf9f5;border-radius:16px;padding:24px;position:relative;overflow:hidden}
+.insight-header{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.insight-label{font-size:11px;font-weight:700;color:#376B10;text-transform:uppercase;letter-spacing:2px}
+.insight-text{font-size:14px;color:#42493e;line-height:1.6}
+.bottom-nav{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);width:90%;max-width:320px;border-radius:9999px;display:flex;justify-content:space-around;align-items:center;padding:8px;box-shadow:0 4px 16px rgba(21,66,18,0.08);z-index:50;background:rgba(255,255,255,0.7);backdrop-filter:blur(20px)}
+.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 16px;border-radius:9999px}
+.nav-item:first-child{background:#2d5a27}
+.nav-icon{font-size:20px;margin-bottom:4px}
+.nav-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#154212}
+.nav-item:first-child .nav-label{color:#b6f48a}
+</style>
+</head>
+<body>
+<div class="phone">
+<div class="container">
+<div class="app-bar">
+<div class="app-bar-left"><div class="avatar">👤</div><span class="app-title">农田管家</span></div>
+<div class="app-bar-right">🔔</div>
+</div>
+<div class="content">
+<div class="page-header">
+<div class="page-title-group"><span class="page-title">当前作物：甜玉米</span></div>
+<div class="progress-card">
+<div class="progress-header"><span class="progress-label">第 7 / 20 节点</span><span class="progress-stage">拔节期</span></div>
+<div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
+</div>
+</div>
+<div class="timeline-scroll">
+<div class="timeline">
+<div class="timeline-item"><div class="timeline-dot completed-dot"><span class="timeline-check">✓</span></div><span class="timeline-label completed-label">1</span><div class="timeline-line completed-line"></div></div>
+<div class="timeline-item"><div class="timeline-dot completed-dot"><span class="timeline-check">✓</span></div><span class="timeline-label completed-label">2</span><div class="timeline-line completed-line"></div></div>
+<div class="timeline-item"><div class="timeline-dot completed-dot"><span class="timeline-check">✓</span></div><span class="timeline-label completed-label">3</span><div class="timeline-line completed-line"></div></div>
+<div class="timeline-item"><div class="timeline-dot completed-dot"><span class="timeline-check">✓</span></div><span class="timeline-label completed-label">4</span><div class="timeline-line completed-line"></div></div>
+<div class="timeline-item"><div class="timeline-dot completed-dot"><span class="timeline-check">✓</span></div><span class="timeline-label completed-label">5</span><div class="timeline-line completed-line"></div></div>
+<div class="timeline-item"><div class="timeline-dot completed-dot"><span class="timeline-check">✓</span></div><span class="timeline-label completed-label">6</span><div class="timeline-line completed-line"></div></div>
+<div class="timeline-item active"><div class="timeline-dot active-dot"><span class="timeline-check">🌾</span></div><span class="timeline-label active-label">7</span><div class="timeline-line upcoming-line"></div></div>
+<div class="timeline-item"><div class="timeline-dot upcoming-dot"><span class="timeline-check">🌿</span></div><span class="timeline-label upcoming-label">8</span><div class="timeline-line upcoming-line"></div></div>
+<div class="timeline-item"><div class="timeline-dot upcoming-dot"><span class="timeline-check">🌿</span></div><span class="timeline-label upcoming-label">9</span></div>
+</div>
+</div>
+<div class="timeline-hint"><span class="timeline-hint-text">↔ 左右滑动查看更多节点</span></div>
+<div class="main-grid">
+<div class="stage-card">
+<div class="stage-card-header">
+<div class="stage-icon-wrapper"><span class="stage-icon">🌾</span></div>
+<div>
+<span class="stage-title">拔节期</span>
+<div class="stage-status-row"><span class="stage-status-badge stage-status-checkable">可打卡</span><span class="stage-date">5月10日</span></div>
+<span class="stage-subtitle">进入快速生长阶段，需注意水肥管理</span>
+</div>
+</div>
+<div class="plan-summary">
+<div class="plan-summary-header"><span>📋</span><span class="plan-summary-title">当前方案</span></div>
+<div class="plan-summary-body">
+<div class="plan-summary-row"><span class="plan-summary-label">积温</span><span class="plan-summary-value">2800℃</span></div>
+<div class="plan-summary-row"><span class="plan-summary-label">土地</span><span class="plan-summary-value">沙地</span></div>
+<div class="plan-summary-row"><span class="plan-summary-label">灌溉</span><span class="plan-summary-value">滴灌</span></div>
+<div class="plan-summary-row"><span class="plan-summary-label">品种</span><span class="plan-summary-value">利合2162</span></div>
+<div class="plan-summary-row"><span class="plan-summary-label">密度</span><span class="plan-summary-value">6700 株/亩</span></div>
+<div class="plan-summary-ref">📈 推荐目标产量：850 kg/亩</div>
+</div>
+</div>
+<div class="stage-description">
+<span class="stage-desc-title">📷 拍摄要求</span>
+<span class="stage-desc-body">①本人田间作业自拍（手持农资入镜）；②肥料/农药包装清晰照。须当日现场拍摄，禁止相册选取旧图。</span>
+</div>
+<div class="stage-actions">
+<div class="btn-upload"><span>📷</span><span>上传照片 0/2</span></div>
+<div class="btn-video"><span>🎥</span><span>上传视频 0/2</span></div>
+</div>
+<div class="subscribe-row">
+<div class="btn-subscribe"><span>🔔</span><span>订阅施肥提醒</span></div>
+</div>
+</div>
+<div class="tasks-card">
+<div class="tasks-header"><span>☑️</span><span class="tasks-title">操作清单</span></div>
+<div class="task-list">
+<div class="task-item"><div class="task-checkbox checked"><span class="task-checkmark">✓</span></div><div class="task-content"><span class="task-name completed-name">检查玉米苗情</span><span class="task-meta">确认苗高、叶色正常</span></div></div>
+<div class="task-item"><div class="task-checkbox checked"><span class="task-checkmark">✓</span></div><div class="task-content"><span class="task-name completed-name">追施拔节肥</span><span class="task-meta">尿素 15kg/亩</span></div></div>
+<div class="task-item"><div class="task-checkbox"></div><div class="task-content"><span class="task-name">灌溉补水</span><span class="task-meta">保持土壤湿润</span></div></div>
+<div class="task-item"><div class="task-checkbox"></div><div class="task-content"><span class="task-name">病虫害巡查</span><span class="task-meta">重点观察玉米螟、蚜虫</span></div></div>
+</div>
+<div class="checkin-action">
+<div class="btn-checkin"><span>📝</span><span>立即打卡</span></div>
+</div>
+</div>
+<div class="insight-card">
+<div class="insight-header"><span>⚠️</span><span class="insight-label">本次打卡注意事项</span></div>
+<div class="insight-text">拔节期是玉米需水需肥高峰期，请确保追肥后及时灌溉，促进养分吸收。注意防治玉米螟幼虫。</div>
+</div>
+</div>
+</div>
+<div class="bottom-nav">
+<div class="nav-item"><span class="nav-icon">🚜</span><span class="nav-label">打卡</span></div>
+<div class="nav-item"><span class="nav-icon">⏱</span><span class="nav-label">记录</span></div>
+<div class="nav-item"><span class="nav-icon">🤖</span><span class="nav-label">AI助手</span></div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+/**
+ * 云函数入口：farmManager
+ *
+ * 路由设计（基于 action 字段 switch-case 分发）：
+ * - action = 'list'    → 获取用户农场列表
+ * - action = 'switch'  → 切换当前活跃农场
+ * - action = 'create'  → 创建新农场
+ * - action = 'detail'  → 获取农场详情
+ */
+
+const cloud = require('wx-server-sdk');
+const Response = require('./utils/response');
+const Auth = require('./middleware/auth');
+const ListCtrl = require('./controllers/list');
+const SwitchCtrl = require('./controllers/switch');
+const CreateCtrl = require('./controllers/create');
+const DetailCtrl = require('./controllers/detail');
+
+cloud.init({
+  env: cloud.DYNAMIC_CURRENT_ENV,
+});
+
+function generateRequestId() {
+  return 'req_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+}
+
+exports.main = async (event, context) => {
+  const requestId = generateRequestId();
+  const data = event.data || event || {};
+  const action = data.action;
+
+  console.log(`[farmManager] requestId=${requestId}, action=${action}`);
+
+  // Step 1: 鉴权 — 从 _auth token 解析 userId
+  let userId;
+  try {
+    userId = Auth.getUserId(data);
+    data.userId = userId; // 将 userId 注入到 event 中，供 Controller 使用
+  } catch (err) {
+    return Response.fail(
+      err.code || 'ERR_UNAUTHORIZED',
+      err.message || '鉴权失败',
+      'logout',
+      requestId
+    );
+  }
+
+  // Step 2: 路由分发
+  try {
+    switch (action) {
+      case 'list':
+        return await ListCtrl.handle(data, requestId);
+      case 'switch':
+        return await SwitchCtrl.handle(data, requestId);
+      case 'create':
+        return await CreateCtrl.handle(data, requestId);
+      case 'detail':
+        return await DetailCtrl.handle(data, requestId);
+      default:
+        return Response.fail(
+          'ERR_INVALID_PARAM',
+          '未知的操作类型：' + action,
+          'fallback',
+          requestId
+        );
+    }
+  } catch (err) {
+    console.error(`[farmManager] unhandled error, requestId=${requestId}`, err);
+    return Response.fail(
+      'ERR_INTERNAL',
+      '系统异常：' + err.message,
+      'fallback',
+      requestId
+    );
+  }
+};

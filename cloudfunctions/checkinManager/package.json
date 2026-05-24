@@ -1,0 +1,9 @@
+{
+  "name": "checkinManager",
+  "version": "1.0.0",
+  "description": "打卡与日志管理云函数：打卡提交、记录列表、详情查询",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

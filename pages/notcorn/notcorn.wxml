@@ -1,0 +1,17 @@
+<view class="container">
+  <view class="card">
+    <view class="card-decoration"></view>
+    <view class="card-icon-wrapper">
+      <text class="card-icon">🚜</text>
+    </view>
+    <view class="card-content">
+      <text class="card-title">不种植玉米？</text>
+      <text class="card-description">
+        感谢您的关注！本应用目前专门针对玉米种植进行优化，为农户提供最佳种植方案。
+      </text>
+    </view>
+    <view class="card-action">
+      <button class="btn-close" bindtap="onClose">关闭</button>
+    </view>
+  </view>
+</view>

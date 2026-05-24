@@ -1,0 +1,32 @@
+# 依赖目录
+node_modules/
+miniprogram_npm/
+
+# 微信开发者工具私人配置
+project.private.config.json
+
+# 本地环境变量（如用于本地调试）
+.env
+.env.local
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# 编辑器配置
+.vscode/
+.idea/
+
+# 自动生成的计划/文档
+.codebuddy/
+
+# Office 临时文件
+~$*
+*.tmp
+
+# 日志文件
+*.log
+npm-debug.log*
+
+# 可选：lock 文件（如团队统一使用 npm，可保留）
+# package-lock.json

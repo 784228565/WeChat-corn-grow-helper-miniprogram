@@ -1,0 +1,93 @@
+<view class="container">
+  <!-- Top App Bar -->
+  <view class="app-bar">
+    <view class="app-bar-left">
+      <view class="avatar">
+        <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill" binderror="onAvatarError" />
+        <view wx:else class="avatar-fallback">👤</view>
+      </view>
+      <text class="app-title">农田管家</text>
+    </view>
+    <view class="app-bar-right">
+      <text class="notification-icon">🔔</text>
+    </view>
+  </view>
+
+  <view class="content">
+    <!-- Header -->
+    <view class="page-header">
+      <text class="page-title">AI 农事助手</text>
+      <text class="page-subtitle">咨询作物健康、天气趋势或病虫害识别。</text>
+    </view>
+
+    <!-- Chat Area -->
+    <view class="chat-area">
+      <view wx:for="{{messages}}" wx:key="index" class="message {{item.type === 'user' ? 'user-message' : 'ai-message'}}">
+        <view wx:if="{{item.type === 'ai'}}" class="ai-avatar">
+          <text class="ai-avatar-icon">🤖</text>
+        </view>
+        <view class="message-bubble {{item.type === 'user' ? 'user-bubble' : 'ai-bubble'}}">
+          <text class="message-text {{item.type === 'user' ? 'user-text' : 'ai-text'}}">{{item.content}}</text>
+          <view class="message-chips" wx:if="{{item.chips && item.chips.length > 0}}">
+            <view wx:for="{{item.chips}}" wx:for-item="chip" wx:key="index" class="chip chip-primary">
+              <text class="chip-text">{{chip.label}}</text>
+            </view>
+          </view>
+          <!-- Steps 思考过程 -->
+          <view class="steps-toggle" wx:if="{{item.steps && item.steps.length > 0}}" bindtap="toggleSteps" data-index="{{index}}">
+            <text class="steps-toggle-text">{{item.showSteps ? '🔽 隐藏思考过程' : '🔍 查看思考过程 (' + item.steps.length + '步)'}}</text>
+          </view>
+          <view class="steps-panel" wx:if="{{item.showSteps && item.steps && item.steps.length > 0}}">
+            <view wx:for="{{item.steps}}" wx:for-item="step" wx:key="sindex" wx:for-index="sindex" class="step-item">
+              <text class="step-role">{{formatRole(step.role)}}</text>
+              <text class="step-content">{{step.content || ''}}</text>
+              <text class="step-meta" wx:if="{{step.time_cost}}">⏱ {{step.time_cost}}ms</text>
+            </view>
+          </view>
+        </view>
+        <view wx:if="{{item.type === 'user'}}" class="user-avatar">
+          <image wx:if="{{avatarUrl}}" class="user-avatar-img" src="{{avatarUrl}}" mode="aspectFill" binderror="onAvatarError" />
+          <view wx:else class="user-avatar-fallback">👤</view>
+        </view>
+      </view>
+      <view wx:if="{{loading}}" class="loading-indicator">
+        <text>🤖 思考中...</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Input Area -->
+  <view class="input-area">
+    <scroll-view class="suggestions-scroll" scroll-x="true" show-scrollbar="false" wx:if="{{suggestions.length > 0}}">
+      <view class="suggestions">
+        <view wx:for="{{suggestions}}" wx:key="index" class="suggestion-chip" bindtap="sendSuggestion" data-query="{{item.query}}">
+          <text class="suggestion-icon">{{item.icon}}</text>
+          <text class="suggestion-text">{{item.text}}</text>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="input-box">
+      <text class="mic-icon">🎤</text>
+      <input class="chat-input" placeholder="输入您的问题..." placeholder-class="input-placeholder" value="{{inputValue}}" bindinput="onInputChange" confirm-type="send" bindconfirm="sendMessage" />
+      <view class="send-btn" bindtap="sendMessage">
+        <text class="send-icon">➤</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Bottom Navigation -->
+  <view class="bottom-nav glass-panel">
+    <view class="nav-item" bindtap="navigateTo" data-page="checkin">
+      <text class="nav-icon">🚜</text>
+      <text class="nav-label">打卡</text>
+    </view>
+    <view class="nav-item" bindtap="navigateTo" data-page="logs">
+      <text class="nav-icon">⏱</text>
+      <text class="nav-label">记录</text>
+    </view>
+    <view class="nav-item active-nav-item" bindtap="navigateTo" data-page="ai">
+      <text class="nav-icon">🤖</text>
+      <text class="nav-label active-nav-label">AI助手</text>
+    </view>
+  </view>
+</view>

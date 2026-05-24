@@ -1,0 +1,9 @@
+{
+  "name": "mediaManager",
+  "version": "1.0.0",
+  "description": "多媒体管理云函数：获取临时访问链接",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

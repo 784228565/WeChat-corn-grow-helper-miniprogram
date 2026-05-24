@@ -1,0 +1,26 @@
+{
+  "pages": [
+    "pages/welcome/welcome",
+    "pages/setup/setup",
+    "pages/checkin/checkin",
+    "pages/logs/logs",
+    "pages/ai/ai",
+    "pages/notcorn/notcorn"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fbf9f5",
+    "navigationBarTitleText": "农田管家",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#fbf9f5",
+    "navigationStyle": "custom"
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于在地图中选择农场位置"
+    }
+  },
+  "requiredPrivateInfos": ["chooseLocation"],
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

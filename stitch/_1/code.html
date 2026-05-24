@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Check-in Logs - The Living Ledger</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&amp;family=Work+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f5f3ef",
+                        "surface-dim": "#dbdad6",
+                        "secondary-container": "#b6f48a",
+                        "surface-variant": "#e4e2de",
+                        "on-tertiary-fixed-variant": "#5e4200",
+                        "on-tertiary-fixed": "#271900",
+                        "primary-container": "#2d5a27",
+                        "surface-tint": "#3b6934",
+                        "tertiary": "#4c3500",
+                        "surface-container-highest": "#e4e2de",
+                        "on-surface-variant": "#42493e",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#002201",
+                        "inverse-surface": "#30312e",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#a1d494",
+                        "on-tertiary-container": "#f3b942",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#a1d494",
+                        "on-surface": "#1b1c1a",
+                        "outline-variant": "#c2c9bb",
+                        "on-primary-fixed-variant": "#23501e",
+                        "surface": "#fbf9f5",
+                        "outline": "#72796e",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#694a00",
+                        "surface-container": "#efeeea",
+                        "inverse-on-surface": "#f2f0ed",
+                        "tertiary-fixed": "#ffdea7",
+                        "primary-fixed": "#bcf0ae",
+                        "secondary-fixed": "#b6f48a",
+                        "on-secondary-fixed": "#0a2000",
+                        "background": "#fbf9f5",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#f8bd45",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#9bd771",
+                        "surface-container-high": "#eae8e4",
+                        "surface-bright": "#fbf9f5",
+                        "secondary": "#376b10",
+                        "on-primary-container": "#9dd090",
+                        "primary": "#154212",
+                        "on-secondary-fixed-variant": "#245100",
+                        "on-background": "#1b1c1a",
+                        "on-secondary-container": "#3d7117",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Work Sans"],
+                        "label": ["Work Sans"]
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .glass-panel {
+                @apply bg-surface/70 backdrop-blur-[20px] shadow-[0_8px_32px_rgba(21,66,18,0.08)];
+            }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body min-h-screen pb-32">
+<header class="flex justify-between items-center px-8 py-6 w-full bg-[#fbf9f5] dark:bg-stone-950 font-['Plus_Jakarta_Sans'] font-bold tracking-tight text-[#154212] dark:text-[#b6f48a] docked full-width top-0 z-40">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Portrait of a rugged farmer wearing a wide-brimmed hat, warm sunlight, natural tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBROaGWhh7dCRxfzZQoYJ2OiDBN9LqxWNNzPgZop6h8OwpUFQ3wV9_5KBdSHtu-y-fHStpH3qhPyHM3TUmqVCGO5bpA8sndcs5sJCCmVKxiKYJgnarYS9lA1NWmFUWgc-yRYHztiHq7doThulZD2jku37126Il_bds8knd_dirT11CTvayQulHVfzN1rfMfGlz1u5yj3qtF3o8vh5wZwi1EZJ3p8M5K42SA_wnJnGhRp65OyaQiAeOs9lLHFhBBn8vqIGuVuOYYTFm"/>
+</div>
+</div>
+<div class="text-xl font-black text-[#154212] dark:text-[#b6f48a] uppercase tracking-wider text-center flex-1">
+            The Living Ledger
+        </div>
+<div class="flex items-center gap-4 hover:opacity-75 transition-opacity active:scale-95 duration-200 cursor-pointer">
+<span class="material-symbols-outlined text-2xl" data-icon="notifications">notifications</span>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-6 mt-8">
+<div class="mb-12 pl-4 border-l-4 border-secondary-fixed">
+<h1 class="font-headline text-4xl lg:text-5xl font-bold text-primary tracking-tight">Check-in Logs</h1>
+<p class="font-body text-on-surface-variant mt-2 text-lg">Your historical ledger of growth and care.</p>
+</div>
+<div class="flex flex-col gap-12">
+<article class="bg-surface-container-low rounded-lg p-8 shadow-[0_8px_32px_rgba(21,66,18,0.04)] relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed opacity-20 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110 duration-500"></div>
+<div class="flex flex-col md:flex-row gap-8 relative z-10">
+<div class="md:w-1/3 flex flex-col gap-4">
+<div>
+<span class="inline-flex items-center px-4 py-1.5 rounded-full bg-primary-fixed text-on-primary-fixed text-sm font-bold font-label uppercase tracking-wide">
+                                R1 - Silking
+                            </span>
+</div>
+<div>
+<h2 class="font-headline text-2xl font-bold text-primary mt-2">Reproductive Stage</h2>
+<p class="font-body text-on-surface-variant text-sm mt-1 flex items-center gap-2">
+<span class="material-symbols-outlined text-base" data-icon="calendar_today">calendar_today</span>
+                                Oct 26, 2023
+                            </p>
+</div>
+<div class="mt-auto pt-4 hidden md:block">
+<span class="text-secondary font-bold text-sm flex items-center gap-1 cursor-pointer hover:underline">
+                                View full report <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</span>
+</div>
+</div>
+<div class="md:w-2/3 flex flex-col gap-6">
+<div class="bg-surface rounded-DEFAULT p-6 shadow-[0_4px_16px_rgba(21,66,18,0.02)]">
+<h3 class="font-headline font-bold text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="task_alt">task_alt</span>
+                                Completed Tasks
+                            </h3>
+<ul class="font-body text-on-surface flex flex-col gap-3">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary mt-0.5 text-lg" data-icon="check_circle">check_circle</span>
+<span>Applied secondary nitrogen dressing via fertigation system.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary mt-0.5 text-lg" data-icon="check_circle">check_circle</span>
+<span>Inspected leaves for early signs of rust; all clear.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary mt-0.5 text-lg" data-icon="check_circle">check_circle</span>
+<span>Calibrated soil moisture sensors in Sector 4.</span>
+</li>
+</ul>
+</div>
+<div class="flex gap-4 overflow-x-auto pb-2 snap-x">
+<div class="flex-shrink-0 w-32 h-32 rounded-DEFAULT overflow-hidden snap-center relative cursor-pointer">
+<img alt="Corn field" class="w-full h-full object-cover transition-transform hover:scale-105" data-alt="Close up of healthy green corn stalks with emerging silks, bright sunlight, rural farm setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6xxxHdMjBvyauTAl5jOV5tLVg2kcSUOfJ0PX46K_kYSgrBldl5qXa16XYOiaQdm8wBi8oQK3zmpmuPzDIZifSojxKSLzsx7bV87OAeJA-7b5KY4f_bDCqegvoVgs9ID77em7mv4VtHc_bEcbL73UAuthh4GmdqfxGXhYmyiktBBuyR9vW79ROBC5boLI4M4XOJ-EE_qWoVbUR0Rx57-ue6nsaA_k8ZhuZkRy8XFqi4fd4JA4-VsOa3V_tnLu9zv7j03jATQHa6XZL"/>
+<div class="absolute inset-0 bg-black/10 hover:bg-black/0 transition-colors"></div>
+</div>
+<div class="flex-shrink-0 w-32 h-32 rounded-DEFAULT overflow-hidden snap-center relative cursor-pointer">
+<img alt="Soil check" class="w-full h-full object-cover transition-transform hover:scale-105" data-alt="Farmer's hands holding rich dark soil next to young corn plants, earthy tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBIaFa1j2qnlM6zFLdQqLaGJ0UkmMy4dEUhAO4tWEXhnMCf8YVIp0arzYDAqdm00OKvX-h6bGa_QcyKV-glqiL8_u-ZtZV92P-ZFtYWoAkPgLdaEOCvbFbg-XGArR1u7sLw9DQcOyAJ0dotmKVq6tbLej4EZJ9YQWk5zmSqKSO_ZtmTXQVQbV_bbWQqlImi1V2zrJc8UuJzCCEtFCs1y2i6kOoAA_RCwRjijvOgVTU2hlewT8gcJTf_OvNmBy9e9SWFMXxbGOchA8y"/>
+<div class="absolute inset-0 bg-black/10 hover:bg-black/0 transition-colors"></div>
+</div>
+<div class="flex-shrink-0 w-32 h-32 rounded-DEFAULT bg-surface-container flex items-center justify-center snap-center text-secondary cursor-pointer hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-3xl" data-icon="play_circle">play_circle</span>
+<span class="absolute bottom-2 text-xs font-bold">1:24</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+<article class="bg-surface-container-low rounded-lg p-8 shadow-[0_8px_32px_rgba(21,66,18,0.04)] relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed opacity-20 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110 duration-500"></div>
+<div class="flex flex-col md:flex-row gap-8 relative z-10">
+<div class="md:w-1/3 flex flex-col gap-4">
+<div>
+<span class="inline-flex items-center px-4 py-1.5 rounded-full bg-primary-fixed text-on-primary-fixed text-sm font-bold font-label uppercase tracking-wide">
+                                V8 - Vegetative
+                            </span>
+</div>
+<div>
+<h2 class="font-headline text-2xl font-bold text-primary mt-2">Vegetative Stage</h2>
+<p class="font-body text-on-surface-variant text-sm mt-1 flex items-center gap-2">
+<span class="material-symbols-outlined text-base" data-icon="calendar_today">calendar_today</span>
+                                Oct 12, 2023
+                            </p>
+</div>
+<div class="mt-auto pt-4 hidden md:block">
+<span class="text-secondary font-bold text-sm flex items-center gap-1 cursor-pointer hover:underline">
+                                View full report <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</span>
+</div>
+</div>
+<div class="md:w-2/3 flex flex-col gap-6">
+<div class="bg-surface rounded-DEFAULT p-6 shadow-[0_4px_16px_rgba(21,66,18,0.02)]">
+<h3 class="font-headline font-bold text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="task_alt">task_alt</span>
+                                Completed Tasks
+                            </h3>
+<ul class="font-body text-on-surface flex flex-col gap-3">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary mt-0.5 text-lg" data-icon="check_circle">check_circle</span>
+<span>Applied post-emergence herbicide.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary mt-0.5 text-lg" data-icon="check_circle">check_circle</span>
+<span>Cleared weeds around the irrigation pumps.</span>
+</li>
+</ul>
+</div>
+<div class="flex gap-4 overflow-x-auto pb-2 snap-x">
+<div class="flex-shrink-0 w-32 h-32 rounded-DEFAULT overflow-hidden snap-center relative cursor-pointer">
+<img alt="Young corn" class="w-full h-full object-cover transition-transform hover:scale-105" data-alt="Wide shot of a young corn field reaching early vegetative stage, green and vibrant, clear sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZoesqZVSgVVsuv_Eu4hf-3TPWVT6UplHJiPHG2erjUo-yAZi2_g8TdXS9nHj8ciD0A8UfQBm92gQsaVBXWyYnZMkg5dwzTdk6qxC0LaquDYiJDwe5NYVCD5KIn9RJXnpiweSwXv68wryMBAC00lUy_uCSbONRTD3piwczC2PBID1ixhkHNR1pCnrfMDLpsPbcGbsSP3Z10wxtr6NlybklzYIlBATKER-UgyHmV2ATHS3y2S9FS-nrt_XFeHnP9LrJzagGV9ZdjLHN"/>
+<div class="absolute inset-0 bg-black/10 hover:bg-black/0 transition-colors"></div>
+</div>
+<div class="flex-shrink-0 w-32 h-32 rounded-DEFAULT bg-surface-container flex items-center justify-center snap-center text-secondary cursor-pointer hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-3xl" data-icon="add_photo_alternate">add_photo_alternate</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+</div>
+</main>
+<nav class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 flex justify-around items-center p-2 bg-white/70 dark:bg-stone-900/70 backdrop-blur-xl shadow-[0_8px_32px_rgba(21,66,18,0.08)] rounded-full">
+<a class="flex flex-col items-center justify-center text-[#154212]/60 dark:text-stone-400 px-6 py-2 hover:bg-[#2D5A27]/10 dark:hover:bg-white/5 transition-colors active:scale-90 transition-transform duration-300 font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest rounded-full" href="#">
+<span class="material-symbols-outlined mb-1 text-xl" data-icon="agriculture">agriculture</span>
+            Check-in
+        </a>
+<a class="flex flex-col items-center justify-center bg-[#2D5A27] text-[#b6f48a] rounded-full px-6 py-2 hover:bg-[#2D5A27]/10 dark:hover:bg-white/5 transition-colors active:scale-90 transition-transform duration-300 font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined mb-1 text-xl" data-icon="history" data-weight="fill" style="font-variation-settings: 'FILL' 1;">history</span>
+            Logs
+        </a>
+<a class="flex flex-col items-center justify-center text-[#154212]/60 dark:text-stone-400 px-6 py-2 hover:bg-[#2D5A27]/10 dark:hover:bg-white/5 transition-colors active:scale-90 transition-transform duration-300 font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest rounded-full" href="#">
+<span class="material-symbols-outlined mb-1 text-xl" data-icon="smart_toy">smart_toy</span>
+            AI Assistant
+        </a>
+</nav>
+</body></html>

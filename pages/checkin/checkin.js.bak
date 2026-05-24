@@ -1,0 +1,922 @@
+/**
+ * ====================================================================
+ * 补丁文件：pages/checkin/checkin.js — 农场管理联调版本
+ * ====================================================================
+ *
+ * 修复内容：
+ * 1. 页面加载时自动调用 farmManager.list 拉取真实农场列表
+ * 2. selectFarm 调用 farmManager.switch 后端接口，支持乐观更新
+ * 3. 数据字段对齐：id → farmId，active → isActive
+ * 4. currentStage / farmName / cropName 从后端动态获取
+ * 5. 空农场状态兜底：显示添加引导
+ * 6. 接入 callCloudFunction 统一请求拦截器
+ *
+ * 应用方式：将本文件内容替换 pages/checkin/checkin.js 的全部内容
+ * ====================================================================
+ */
+
+const { callCloudFunction } = require('../../utils/request');
+const cornPlanner = require('../../corn-planner/index');
+
+// 阶段名称映射表（用于 WXML 渲染阶段全称）
+const STAGE_NAMES = {
+  'VE': '出苗期',
+  'V1': '一叶期',
+  'V2': '二叶期',
+  'V3': '三叶期',
+  'V4': '四叶期',
+  'V5': '五叶期',
+  'V6': '六叶期',
+  'V7': '七叶期',
+  'V8': '八叶期',
+  'V9': '九叶期',
+  'VT': '抽雄期',
+  'R1': '吐丝期'
+};
+
+// 阶段图标映射
+const STAGE_ICONS = {
+  'VE': '🌱', 'V1': '🌿', 'V2': '🌸', 'V3': '🌾',
+  'V4': '🌾', 'V5': '🌾', 'V6': '🌽', 'V7': '🌽',
+  'V8': '🌽', 'V9': '🌽', 'VT': '🌻', 'R1': '🌻'
+};
+
+// 阶段目标日期和阶段数据不再硬编码，改为通过 cornPlanner.generateStageCalendar(farm) 动态生成
+// 每个方案根据积温、土壤、灌溉方式生成专属的12阶段日历（含精确日期、任务、注意事项）
+
+/**
+ * 计算阶段状态
+ * @param {string} stage - 阶段代码
+ * @param {Date} now - 当前日期
+ * @returns {string} 'readable' | 'checkable' | 'expired'
+ */
+function computeStageStatus(targetDateStr, now) {
+  if (!targetDateStr) return 'readable';
+  var year = now.getFullYear();
+  var parts = targetDateStr.split('-');
+  var month = parseInt(parts[0], 10);
+  var day = parseInt(parts[1], 10);
+  var targetDate = new Date(year, month - 1, day, 0, 0, 0, 0);
+
+  var diffMs = now.getTime() - targetDate.getTime();
+  var diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays < -2) return 'readable';
+  if (diffDays <= 2) return 'checkable';
+  return 'expired';
+}
+
+/**
+ * 找到最佳展示阶段
+ * 优先级：可打卡 > 最近过期 > 最早可读
+ */
+function findBestStage(calendar, now) {
+  var stages = ['VE', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'VT', 'R1'];
+  for (var i = 0; i < stages.length; i++) {
+    var data = calendar[stages[i]];
+    if (data && computeStageStatus(data.targetDate, now) === 'checkable') {
+      return stages[i];
+    }
+  }
+  for (var j = stages.length - 1; j >= 0; j--) {
+    var data2 = calendar[stages[j]];
+    if (data2 && computeStageStatus(data2.targetDate, now) === 'expired') {
+      return stages[j];
+    }
+  }
+  return stages[0];
+}
+
+/**
+ * 计算所有阶段的状态（用于 timeline 渲染）
+ */
+function computeAllStageStatuses(calendar, now) {
+  var stages = ['VE', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'VT', 'R1'];
+  var result = {};
+  for (var i = 0; i < stages.length; i++) {
+    var data = calendar[stages[i]];
+    result[stages[i]] = data ? computeStageStatus(data.targetDate, now) : 'readable';
+  }
+  return result;
+}
+
+/**
+ * 状态文本映射
+ */
+function getStatusText(status) {
+  var map = { readable: '未开放', checkable: '可打卡', expired: '已逾期' };
+  return map[status] || status;
+}
+
+Page({
+  data: {
+    // 农场与阶段信息
+    farmId: null,
+    farmName: '',
+    cropName: '',
+    currentStage: 'VE',
+    currentStageIndex: 1,
+    totalStages: 12,
+    stageName: 'Emergence',
+    stageIcon: '🌱',
+    stageDescription: '',
+    stageNotes: '',
+    stageTargetDate: '',
+
+    // 任务列表
+    tasks: [],
+    checkedIn: false,
+
+    // 阶段状态控制（readable | checkable | expired）
+    stageStatus: 'readable',
+    stageStatusText: '未开放',
+    canCheckIn: false,
+    uploadCount: 0,
+    uploadRemaining: 2,
+    stageStatuses: {},
+
+    // 农场下拉菜单
+    showFarmMenu: false,
+    farms: [],
+
+    // 加载状态
+    loading: true,
+    loadingDetail: false,
+    hasFarms: false,
+
+    // 订阅状态
+    hasSubscribed: false,
+
+    // 方案摘要
+    planScenario: null,
+
+    // 动态阶段日历（由 corn-planner 根据方案生成）
+    planCalendar: null
+  },
+
+  /**
+   * 检查当前用户订阅状态
+   */
+  checkSubscriptionStatus: function() {
+    var that = this;
+    callCloudFunction('subscribeManager', {
+      action: 'check'
+    }).then(function(res) {
+      if (res.success) {
+        that.setData({ hasSubscribed: res.data.subscribed });
+        console.log('[checkin] subscription status:', res.data.subscribed);
+      }
+    }).catch(function(err) {
+      console.warn('[checkin] check subscription failed:', err);
+    });
+  },
+
+  /**
+   * 页面加载：拉取农场列表 + 活跃农场详情
+   */
+  onLoad() {
+    this.loadFarmList();
+  },
+
+  /**
+   * 页面显示：刷新列表（处理从 setup 返回的情况）
+   */
+  onShow() {
+    this.loadFarmList();
+  },
+
+  /**
+   * 拉取农场列表
+   */
+  async loadFarmList() {
+    this.setData({ loading: true });
+
+    try {
+      const res = await callCloudFunction('farmManager', { action: 'list' });
+
+      if (!res.success) {
+        wx.showToast({ title: res.error.errMsg || '加载失败', icon: 'none' });
+        this.setData({ loading: false });
+        return;
+      }
+
+      const rawFarms = res.data.farms || [];
+
+      // 无农场：显示空状态
+      if (rawFarms.length === 0) {
+        this.setData({
+          farms: [],
+          hasFarms: false,
+          loading: false,
+          farmName: '',
+          cropName: '',
+          currentStage: 'VE',
+          currentStageIndex: 1
+        });
+        return;
+      }
+
+      // 字段对齐：将后端结构转为前端友好的结构
+      const farms = rawFarms.map(function(f) {
+        return {
+          farmId: f.farmId,
+          name: f.name,
+          location: (f.location && f.location.address) ? f.location.address : '位置未知',
+          isActive: !!f.isActive,
+          currentStage: f.currentStage || 'VE',
+          cropType: f.cropType || 'corn'
+        };
+      });
+
+      // 找到当前活跃农场
+      let activeFarm = farms.find(function(f) { return f.isActive; });
+
+      // 兜底：如果没有活跃农场，默认第一个
+      if (!activeFarm && farms.length > 0) {
+        activeFarm = farms[0];
+        farms[0].isActive = true;
+      }
+
+      this.setData({
+        farms: farms,
+        hasFarms: true,
+        farmId: activeFarm ? activeFarm.farmId : null,
+        farmName: activeFarm ? activeFarm.name : '',
+        cropName: activeFarm ? formatCropName(activeFarm.cropType) : '',
+        currentStage: activeFarm ? activeFarm.currentStage : 'VE',
+        stageName: activeFarm ? (STAGE_NAMES[activeFarm.currentStage] || '未知') : '出苗期',
+        stageIcon: activeFarm ? (STAGE_ICONS[activeFarm.currentStage] || '🌱') : '🌱',
+        loading: false
+      });
+
+      // 拉取活跃农场的完整详情（loadFarmDetail 内部会生成日历并计算最佳阶段）
+      if (activeFarm && activeFarm.farmId) {
+        this.loadFarmDetail(activeFarm.farmId, activeFarm.currentStage || 'VE');
+      }
+    } catch (err) {
+      console.error('[checkin] loadFarmList failed:', err);
+      wx.showToast({ title: '网络异常，请稍后重试', icon: 'none' });
+      this.setData({ loading: false });
+    }
+  },
+
+  /**
+   * 拉取农场详情
+   * @param {string} farmId
+   * @param {string} overrideStage - 可选，覆盖后端 currentStage
+   */
+  async loadFarmDetail(farmId, overrideStage) {
+    if (!farmId) return;
+    this.setData({ loadingDetail: true });
+
+    try {
+      console.log('[checkin] loadFarmDetail start, farmId=', farmId);
+      const res = await callCloudFunction('farmManager', {
+        action: 'detail',
+        farmId: farmId
+      });
+      console.log('[checkin] loadFarmDetail response:', res);
+
+      if (!res.success || !res.data || !res.data.farm) {
+        console.warn('[checkin] loadFarmDetail invalid response:', res);
+        this.setData({ loadingDetail: false });
+        return;
+      }
+
+      const farm = res.data.farm;
+      const stage = farm.stage || {};
+
+      // 生成动态阶段日历（基于农场条件）
+      var calendar = cornPlanner.generateStageCalendar(farm);
+
+      // 计算最佳展示阶段（基于当前日期）
+      var now = new Date();
+      var bestStage = calendar ? cornPlanner.findBestStage(calendar, now) : (overrideStage || 'VE');
+
+      // 优先使用最佳阶段，除非 overrideStage 明确指定
+      var currentStage = overrideStage || bestStage || stage.currentStage || 'VE';
+      var stageIndex = 1;
+      var stages = ['VE', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'VT', 'R1'];
+      for (var i = 0; i < stages.length; i++) {
+        if (stages[i] === currentStage) { stageIndex = i + 1; break; }
+      }
+
+      // 计算阶段状态
+      var stageData = calendar && calendar[currentStage] ? calendar[currentStage] : {};
+      var status = stageData.targetDate ? computeStageStatus(stageData.targetDate, now) : 'readable';
+
+      var allStatuses = calendar ? computeAllStageStatuses(calendar, now) : {};
+
+      var targetDateStr = stageData.targetDate || '';
+
+      this.setData({
+        currentStage: currentStage,
+        currentStageIndex: stageIndex,
+        totalStages: 12,
+        stageName: STAGE_NAMES[currentStage] || 'Unknown',
+        stageIcon: STAGE_ICONS[currentStage] || '🌱',
+        stageDescription: stageData.description || '',
+        stageNotes: stageData.notes || '',
+        stageStatus: status,
+        stageStatusText: getStatusText(status),
+        stageTargetDate: targetDateStr ? (targetDateStr.replace('-', '/') + ' 目标日期') : '',
+        canCheckIn: status !== 'readable',
+        stageStatuses: allStatuses,
+        farmName: farm.name,
+        cropName: formatCropName(farm.cropType),
+        farmDetail: farm,
+        planCalendar: calendar,
+        loadingDetail: false
+      });
+
+      // 从动态日历加载当前阶段任务
+      this.loadPlanFromCalendar(currentStage);
+
+      // 加载方案摘要
+      this.loadPlanSummary(farm);
+
+      // 加载当前阶段的打卡和上传状态
+      this.loadStageStatus(farmId, currentStage);
+
+      // 检查订阅状态
+      this.checkSubscriptionStatus();
+    } catch (err) {
+      console.error('[checkin] loadFarmDetail failed:', err);
+      this.setData({ loadingDetail: false });
+    }
+  },
+
+  /**
+   * 切换农场（核心交互）
+   * 采用乐观更新策略：先更新 UI，再请求后端，失败时回滚
+   */
+  async selectFarm(e) {
+    const farmId = e.currentTarget.dataset.farmid;
+    if (!farmId || farmId === this.data.farmId) {
+      this.setData({ showFarmMenu: false });
+      return;
+    }
+
+    const targetFarm = this.data.farms.find(function(f) { return f.farmId === farmId; });
+    if (!targetFarm) {
+      this.setData({ showFarmMenu: false });
+      return;
+    }
+
+    // ===== 乐观更新：立即刷新 UI =====
+    const prevFarmId = this.data.farmId;
+    const prevStage = this.data.currentStage;
+    const prevFarmName = this.data.farmName;
+
+    // 注意：targetFarm 来自列表，缺少 accumulatedTemp 等计划字段
+    // 日历在 loadFarmDetail 中生成，这里先用简单过渡状态
+    var displayStage = targetFarm.currentStage || 'VE';
+    var stageIndex = 1;
+    var stages = ['VE', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'VT', 'R1'];
+    for (var si = 0; si < stages.length; si++) {
+      if (stages[si] === displayStage) { stageIndex = si + 1; break; }
+    }
+
+    const updatedFarms = this.data.farms.map(function(f) {
+      return Object.assign({}, f, { isActive: f.farmId === farmId });
+    });
+
+    this.setData({
+      showFarmMenu: false,
+      farms: updatedFarms,
+      farmId: farmId,
+      farmName: targetFarm.name,
+      cropName: formatCropName(targetFarm.cropType),
+      currentStage: displayStage,
+      currentStageIndex: stageIndex,
+      stageName: STAGE_NAMES[displayStage] || 'Unknown',
+      stageIcon: STAGE_ICONS[displayStage] || '🌱',
+      stageDescription: '加载方案日历中...',
+      stageNotes: '',
+      stageStatus: 'readable',
+      stageStatusText: '未开放',
+      canCheckIn: false,
+      stageStatuses: {},
+      planCalendar: null,
+      tasks: [],
+      loadingDetail: true,
+      checkedIn: false
+    });
+
+    // ===== 后台请求：调用 switch 接口 =====
+    try {
+      const res = await callCloudFunction('farmManager', {
+        action: 'switch',
+        farmId: farmId
+      });
+
+      if (!res.success) {
+        // 请求失败：回滚到上一个农场
+        console.warn('[checkin] switch failed, rolling back:', res.error);
+        this.rollbackFarmSelection(prevFarmId, prevStage, prevFarmName);
+        wx.showToast({
+          title: res.error.errMsg || '切换失败，请重试',
+          icon: 'none'
+        });
+        return;
+      }
+
+      wx.showToast({
+        title: '已切换到：' + res.data.name,
+        icon: 'none',
+        duration: 1500
+      });
+
+      // 拉取新农场的完整详情（使用最佳阶段覆盖）
+      console.log('[checkin] switch success, loading detail for', farmId);
+      this.loadFarmDetail(farmId, displayStage);
+
+      // 触发模块三：通知任务模块农场已切换
+      this.emitFarmSwitched(farmId, displayStage);
+    } catch (err) {
+      console.error('[checkin] switch error:', err);
+      this.rollbackFarmSelection(prevFarmId, prevStage, prevFarmName);
+      wx.showToast({ title: '网络异常，切换失败: ' + (err.message || ''), icon: 'none' });
+    }
+  },
+
+  /**
+   * 加载当前阶段的打卡和上传状态
+   */
+  async loadStageStatus(farmId, stage) {
+    try {
+      // 查询该阶段是否已打卡
+      var checkRes = await callCloudFunction('checkinManager', {
+        action: 'list',
+        farmId: farmId,
+        page: 1,
+        limit: 50
+      });
+      var checkedIn = false;
+      if (checkRes.success && checkRes.data.logs) {
+        checkedIn = checkRes.data.logs.some(function(log) { return log.stage === stage; });
+      }
+
+      // 查询该阶段已上传的媒体文件数量
+      var mediaRes = await callCloudFunction('mediaManager', {
+        action: 'listByStage',
+        farmId: farmId,
+        stage: stage
+      });
+      var uploadCount = 0;
+      if (mediaRes.success && mediaRes.data.files) {
+        uploadCount = mediaRes.data.files.length;
+      }
+
+      this.setData({
+        checkedIn: checkedIn,
+        uploadCount: uploadCount,
+        uploadRemaining: Math.max(0, 2 - uploadCount)
+      });
+    } catch (err) {
+      console.warn('[checkin] loadStageStatus failed:', err);
+    }
+  },
+
+  /**
+   * 回滚农场选择（乐观更新失败时调用）
+   */
+  rollbackFarmSelection(prevFarmId, prevStage, prevFarmName) {
+    var calendar = this.data.planCalendar;
+    var prevStageData = calendar && calendar[prevStage] ? calendar[prevStage] : {};
+    var prevStatus = prevStageData.targetDate ? computeStageStatus(prevStageData.targetDate, new Date()) : 'readable';
+    const farms = this.data.farms.map(function(f) {
+      return Object.assign({}, f, { isActive: f.farmId === prevFarmId });
+    });
+    this.setData({
+      farms: farms,
+      farmId: prevFarmId,
+      currentStage: prevStage,
+      farmName: prevFarmName,
+      stageName: STAGE_NAMES[prevStage] || '未知',
+      stageIcon: STAGE_ICONS[prevStage] || '🌱',
+      stageDescription: prevStageData.description || '',
+      stageNotes: prevStageData.notes || '',
+      stageStatus: prevStatus,
+      stageStatusText: getStatusText(prevStatus),
+      canCheckIn: prevStatus !== 'readable',
+      stageStatuses: calendar ? computeAllStageStatuses(calendar, new Date()) : {},
+      planCalendar: calendar,
+      loadingDetail: false
+    });
+  },
+
+  /**
+   * 触发跨模块事件（模块三接入点）
+   */
+  emitFarmSwitched(farmId, currentStage) {
+    // 方案 A：事件总线（推荐）
+    try {
+      const eventBus = require('../../utils/eventBus');
+      eventBus.emit('farm:switched', { farmId: farmId, currentStage: currentStage });
+    } catch (e) {
+      // 方案 B：App.globalData 兜底
+      const app = getApp();
+      if (app && app.globalData) {
+        app.globalData.farmInfo = {
+          farmId: farmId,
+          currentStage: currentStage,
+          switchedAt: Date.now()
+        };
+      }
+    }
+  },
+
+  /**
+   * 从动态日历加载阶段任务（新接口）
+   */
+  loadPlanFromCalendar(stage) {
+    try {
+      var calendar = this.data.planCalendar;
+      if (!calendar || !calendar[stage]) {
+        console.warn('[checkin] no calendar data for stage:', stage);
+        this.setData({ tasks: [] });
+        return;
+      }
+      var stageData = calendar[stage];
+      console.log('[checkin] loadPlanFromCalendar stage:', stage, 'tasks:', stageData.tasks ? stageData.tasks.length : 0);
+      this.setData({
+        tasks: stageData.tasks || []
+      });
+    } catch (err) {
+      console.error('[checkin] loadPlanFromCalendar error:', err);
+      this.setData({ tasks: [] });
+    }
+  },
+
+  /**
+   * 加载个性化方案摘要（基于 corn-planner）
+   */
+  loadPlanSummary(farm) {
+    try {
+      if (!farm || !farm.accumulatedTemp) {
+        this.setData({ planScenario: null });
+        return;
+      }
+      var scenario = cornPlanner.matchScenario(farm.accumulatedTemp, farm.soilType, farm.irrigation);
+      if (!scenario) {
+        this.setData({ planScenario: null });
+        return;
+      }
+      var summary = cornPlanner.getPlanSummary(farm, scenario);
+      summary.farmName = farm.name;
+      summary.accumulatedTemp = farm.accumulatedTemp;
+      summary.soilType = farm.soilType;
+      summary.irrigation = farm.irrigation;
+      summary.userVariety = farm.planting && farm.planting.variety ? farm.planting.variety : '';
+      summary.userDensity = farm.planting && farm.planting.density ? farm.planting.density : '';
+      summary.userRowSpacing = farm.planting && farm.planting.rowSpacing ? farm.planting.rowSpacing : '';
+      this.setData({ planScenario: summary });
+    } catch (err) {
+      console.error('[checkin] loadPlanSummary error:', err);
+      this.setData({ planScenario: null });
+    }
+  },
+
+  /**
+   * 加载个性化方案任务（旧接口，已废弃）
+   */
+  loadPlan(farm, stage) {
+    console.log('[checkin] loadPlan is deprecated, use loadPlanFromCalendar + loadPlanSummary instead');
+    this.loadPlanFromCalendar(stage);
+    this.loadPlanSummary(farm);
+  },
+
+  /**
+   * 加载任务清单（模块三接入）—— 已废弃，由 loadPlan 替代
+   */
+  async loadTasks(farmId, stage) {
+    console.log('[checkin] loadTasks is deprecated, use loadPlan instead');
+  },
+
+  /**
+   * 任务切换（对接 taskManager.toggleTask）
+   * 前端乐观更新 + 后端同步，失败时回滚
+   */
+  async toggleTask(e) {
+    const id = e.currentTarget.dataset.id;
+    const prevTasks = this.data.tasks;
+    const task = prevTasks.find(function(t) { return t.id === id; });
+    if (!task) return;
+
+    const newCompleted = !task.completed;
+
+    // 乐观更新 UI
+    const tasks = prevTasks.map(function(t) {
+      if (t.id === id) {
+        return Object.assign({}, t, {
+          completed: newCompleted,
+          meta: newCompleted ? '刚刚' : t.meta
+        });
+      }
+      return t;
+    });
+    this.setData({ tasks: tasks });
+
+    // 同步到后端
+    try {
+      var res = await callCloudFunction('taskManager', {
+        action: 'toggleTask',
+        farmId: this.data.farmId,
+        taskId: id,
+        completed: newCompleted,
+        timestamp: Date.now()
+      });
+      if (!res.success) {
+        // 后端失败，回滚前端状态
+        this.setData({ tasks: prevTasks });
+        wx.showToast({ title: res.error?.errMsg || '更新失败', icon: 'none' });
+      }
+    } catch (err) {
+      // 网络异常，回滚前端状态
+      this.setData({ tasks: prevTasks });
+      wx.showToast({ title: '网络异常，请重试', icon: 'none' });
+    }
+  },
+
+  /**
+   * 打卡提交（对接 checkinManager.submit）
+   */
+  async onCheckIn() {
+    // 状态校验：可读状态不能打卡
+    if (this.data.stageStatus === 'readable') {
+      wx.showToast({ title: '该阶段未到打卡时间', icon: 'none' });
+      return;
+    }
+
+    // 已打卡校验
+    if (this.data.checkedIn) {
+      wx.showToast({ title: '该阶段已打卡，请勿重复打卡', icon: 'none' });
+      return;
+    }
+
+    const allCompleted = this.data.tasks.every(function(t) { return t.completed; });
+    if (!allCompleted) {
+      wx.showToast({
+        title: '请先完成所有任务',
+        icon: 'none'
+      });
+      return;
+    }
+
+    var farm = this.data.farms.find(function(f) { return f.farmId === this.data.farmId; }.bind(this));
+    var timestamp = Date.now();
+
+    try {
+      var res = await callCloudFunction('checkinManager', {
+        action: 'submit',
+        farmId: this.data.farmId,
+        stage: this.data.currentStage,
+        timestamp: timestamp,
+        location: farm ? farm.location : '',
+        note: '',
+        photos: []
+      });
+
+      if (!res.success) {
+        wx.showToast({
+          title: res.error.errMsg || '打卡失败',
+          icon: 'none'
+        });
+        return;
+      }
+
+      this.setData({ checkedIn: true });
+      wx.showToast({
+        title: '打卡成功！',
+        icon: 'success',
+        duration: 2000
+      });
+
+      setTimeout(function() {
+        wx.navigateTo({ url: '/pages/logs/logs' });
+      }, 1500);
+    } catch (err) {
+      console.error('[checkin] submit error:', err);
+      wx.showToast({ title: 'Network error, please retry', icon: 'none' });
+    }
+  },
+
+  /**
+   * 上传图片/视频（每阶段最多2次）
+   */
+  async onUploadMedia(e) {
+    // 状态校验：可读状态不能上传
+    if (this.data.stageStatus === 'readable') {
+      wx.showToast({ title: '该阶段未到上传时间', icon: 'none' });
+      return;
+    }
+
+    // 次数校验
+    if (this.data.uploadRemaining <= 0) {
+      wx.showToast({ title: '该阶段上传次数已达上限（2次）', icon: 'none' });
+      return;
+    }
+
+    var fileType = e.currentTarget.dataset.type; // 'image' or 'video'
+    var that = this;
+
+    // 选择文件
+    var chooseFunc = fileType === 'video' ? wx.chooseVideo : wx.chooseImage;
+    var chooseParams = fileType === 'video'
+      ? { sourceType: ['album', 'camera'], maxDuration: 60, camera: 'back' }
+      : { count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'] };
+
+    chooseFunc.call(wx, Object.assign({}, chooseParams, {
+      success: function(res) {
+        var tempFilePath = fileType === 'video' ? res.tempFilePath : res.tempFilePaths[0];
+        var cloudPath = 'media/' + that.data.farmId + '/' + that.data.currentStage + '/' + Date.now() + '_' + Math.floor(Math.random() * 10000) + (fileType === 'video' ? '.mp4' : '.jpg');
+
+        wx.showLoading({ title: '上传中...' });
+
+        wx.cloud.uploadFile({
+          cloudPath: cloudPath,
+          filePath: tempFilePath,
+          success: function(uploadRes) {
+            // 记录上传
+            callCloudFunction('mediaManager', {
+              action: 'upload',
+              farmId: that.data.farmId,
+              stage: that.data.currentStage,
+              fileId: uploadRes.fileID,
+              fileType: fileType
+            }).then(function(recordRes) {
+              wx.hideLoading();
+              if (recordRes.success) {
+                var newCount = that.data.uploadCount + 1;
+                that.setData({
+                  uploadCount: newCount,
+                  uploadRemaining: Math.max(0, 2 - newCount)
+                });
+                wx.showToast({ title: '上传成功（还剩' + that.data.uploadRemaining + '次）', icon: 'none' });
+              } else {
+                wx.showToast({ title: recordRes.error?.errMsg || '上传记录失败', icon: 'none' });
+              }
+            }).catch(function(err) {
+              wx.hideLoading();
+              console.error('[checkin] upload record failed:', err);
+              wx.showToast({ title: '上传记录失败', icon: 'none' });
+            });
+          },
+          fail: function(err) {
+            wx.hideLoading();
+            console.error('[checkin] upload file failed:', err);
+            wx.showToast({ title: '上传失败', icon: 'none' });
+          }
+        });
+      },
+      fail: function(err) {
+        console.log('[checkin] user cancelled upload');
+      }
+    }));
+  },
+
+  /**
+   * 点击 Timeline 节点切换阶段
+   */
+  onSelectStage(e) {
+    var stage = e.currentTarget.dataset.stage;
+    if (!stage || stage === this.data.currentStage) return;
+
+    var now = new Date();
+    var calendar = this.data.planCalendar;
+    var stageData = calendar && calendar[stage] ? calendar[stage] : {};
+    var status = stageData.targetDate ? computeStageStatus(stageData.targetDate, now) : 'readable';
+    var stageIndex = 1;
+    var stages = ['VE', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'VT', 'R1'];
+    for (var i = 0; i < stages.length; i++) {
+      if (stages[i] === stage) { stageIndex = i + 1; break; }
+    }
+    var targetDateStr = stageData.targetDate || '';
+
+    this.setData({
+      currentStage: stage,
+      currentStageIndex: stageIndex,
+      stageName: STAGE_NAMES[stage] || 'Unknown',
+      stageIcon: STAGE_ICONS[stage] || '🌱',
+      stageDescription: stageData.description || '',
+      stageNotes: stageData.notes || '',
+      stageStatus: status,
+      stageStatusText: getStatusText(status),
+      stageTargetDate: targetDateStr ? (targetDateStr.replace('-', '/') + ' 目标日期') : '',
+      canCheckIn: status !== 'readable',
+      checkedIn: false,
+      tasks: [],
+      loadingDetail: true
+    });
+
+    // 加载新阶段的任务和状态，完成后关闭 loading
+    var that = this;
+    Promise.all([
+      new Promise(function(resolve) {
+        that.loadPlanFromCalendar(stage);
+        resolve();
+      }),
+      that.loadStageStatus(that.data.farmId, stage)
+    ]).then(function() {
+      that.setData({ loadingDetail: false });
+    }).catch(function() {
+      that.setData({ loadingDetail: false });
+    });
+  },
+
+  /**
+   * 下拉菜单开关
+   */
+  toggleFarmMenu() {
+    this.setData({ showFarmMenu: !this.data.showFarmMenu });
+  },
+
+  closeFarmMenu() {
+    this.setData({ showFarmMenu: false });
+  },
+
+  /**
+   * 添加新农场
+   */
+  addNewFarm() {
+    console.log('[checkin] addNewFarm clicked');
+    this.setData({ showFarmMenu: false });
+    wx.navigateTo({
+      url: '/pages/setup/setup?mode=new',
+      success: function() {
+        console.log('[checkin] navigateTo setup success');
+      },
+      fail: function(err) {
+        console.error('[checkin] navigateTo setup failed:', err);
+        wx.showToast({ title: '跳转失败: ' + err.errMsg, icon: 'none' });
+      }
+    });
+  },
+
+  /**
+   * 请求订阅次日施肥提醒
+   */
+  requestSubscribe() {
+    var that = this;
+    var TEMPLATE_ID = '-wzNyO3VNSqWHEZzgt1LLuhP0GQ3bex0Pp8TYBaZNAg';
+
+    if (!TEMPLATE_ID || TEMPLATE_ID.length < 20) {
+      wx.showToast({ title: '模板ID格式不正确', icon: 'none' });
+      console.warn('[checkin] 模板ID格式不正确');
+      return;
+    }
+
+    wx.requestSubscribeMessage({
+      tmplIds: [TEMPLATE_ID],
+      success: function(res) {
+        console.log('[checkin] subscribe result:', res);
+        if (res[TEMPLATE_ID] === 'accept') {
+          wx.showToast({ title: '订阅成功', icon: 'success' });
+          that.setData({ hasSubscribed: true });
+          // 通知后端保存订阅状态
+          callCloudFunction('subscribeManager', {
+            action: 'subscribe',
+            farmId: that.data.farmId,
+            templateId: TEMPLATE_ID
+          }).catch(function(err) {
+            console.warn('[checkin] save subscribe failed:', err);
+          });
+        } else if (res[TEMPLATE_ID] === 'reject') {
+          wx.showToast({ title: '您已拒绝订阅', icon: 'none' });
+        } else if (res[TEMPLATE_ID] === 'ban') {
+          wx.showToast({ title: '请前往设置开启订阅权限', icon: 'none' });
+        }
+      },
+      fail: function(err) {
+        console.error('[checkin] requestSubscribeMessage failed:', err);
+        wx.showToast({ title: '订阅失败: ' + (err.errMsg || ''), icon: 'none' });
+      }
+    });
+  },
+
+  /**
+   * 底部导航
+   */
+  navigateTo(e) {
+    const page = e.currentTarget.dataset.page;
+    if (page === 'checkin') return;
+    wx.navigateTo({
+      url: '/pages/' + page + '/' + page
+    });
+  }
+});
+
+/**
+ * 作物类型 → 显示名称
+ */
+function formatCropName(cropType) {
+  const map = {
+    'corn': '甜玉米',
+    'soybean': '大豆',
+    'wheat': '小麦',
+    'rice': '水稻',
+    'cotton': '棉花'
+  };
+  return map[cropType] || (cropType || '作物');
+}

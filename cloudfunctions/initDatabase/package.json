@@ -1,0 +1,9 @@
+{
+  "name": "initDatabase",
+  "version": "1.0.0",
+  "description": "数据库初始化云函数 — 一键创建集合并插入默认模板数据",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "^3.0.4"
+  }
+}

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Growth Stage Check-in - The Living Ledger</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;900&amp;family=Work+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f5f3ef",
+                        "surface-dim": "#dbdad6",
+                        "secondary-container": "#b6f48a",
+                        "surface-variant": "#e4e2de",
+                        "on-tertiary-fixed-variant": "#5e4200",
+                        "on-tertiary-fixed": "#271900",
+                        "primary-container": "#2d5a27",
+                        "surface-tint": "#3b6934",
+                        "tertiary": "#4c3500",
+                        "surface-container-highest": "#e4e2de",
+                        "on-surface-variant": "#42493e",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#002201",
+                        "inverse-surface": "#30312e",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#a1d494",
+                        "on-tertiary-container": "#f3b942",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#a1d494",
+                        "on-surface": "#1b1c1a",
+                        "outline-variant": "#c2c9bb",
+                        "on-primary-fixed-variant": "#23501e",
+                        "surface": "#fbf9f5",
+                        "outline": "#72796e",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#694a00",
+                        "surface-container": "#efeeea",
+                        "inverse-on-surface": "#f2f0ed",
+                        "tertiary-fixed": "#ffdea7",
+                        "primary-fixed": "#bcf0ae",
+                        "secondary-fixed": "#b6f48a",
+                        "on-secondary-fixed": "#0a2000",
+                        "background": "#fbf9f5",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#f8bd45",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#9bd771",
+                        "surface-container-high": "#eae8e4",
+                        "surface-bright": "#fbf9f5",
+                        "secondary": "#376b10",
+                        "on-primary-container": "#9dd090",
+                        "primary": "#154212",
+                        "on-secondary-fixed-variant": "#245100",
+                        "on-background": "#1b1c1a",
+                        "on-secondary-container": "#3d7117",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Work Sans"],
+                        "label": ["Work Sans"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            font-family: theme('fontFamily.body');
+        }
+        h1, h2, h3, h4, h5, h6, .font-headline {
+            font-family: theme('fontFamily.headline');
+        }
+        /* Custom Scrollbar for timeline */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 bg-[#fbf9f5] dark:bg-stone-950 flat no shadows flex justify-between items-center px-8 py-6 w-full z-40 sticky">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="close-up portrait of a smiling young farmer with a slight beard in soft natural daylight outdoors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA46nmwgyqkwoH_LeEvJYMqGmqbukjMAuHRBX8pKfopcDRBnjyrqp7aA_PhRI2MAJpg34yNKfICUPuYyZrAQjh_Da7kM4lRMkXRzZvCq-vMC2WpJJYLut9EkcpymplKQucPUKzUDQ8kWgDLrbArUoK1GRSvXzMzGC2jEt_QcUEtq_blKe2lfNwYhyiATQmSdwiKdit8MiTDH3I6ZjOXEnM5WdqibIv0tbgCnH_R8uwDxc0uLWIWZx9oEO1P_iTrWbBPtxXehoHi9iFZ"/>
+</div>
+<h1 class="font-['Plus_Jakarta_Sans'] font-bold tracking-tight text-xl font-black text-[#154212] dark:text-[#b6f48a] uppercase">The Living Ledger</h1>
+</div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container hover:opacity-75 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#154212] dark:text-[#b6f48a]" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="max-w-7xl mx-auto px-4 sm:px-8 mt-8 flex flex-col gap-12">
+<!-- Header Section -->
+<section class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pl-4 md:pl-10">
+<div>
+<h2 class="font-headline text-4xl md:text-5xl font-bold text-primary mb-2">Growth Stage Check-in</h2>
+<p class="font-body text-on-surface-variant text-lg">Current Crop: Heritage Sweet Corn</p>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-4 w-full md:w-auto shadow-[0_8px_32px_rgba(21,66,18,0.04)] min-w-[250px]">
+<div class="flex justify-between items-center mb-2">
+<span class="font-label text-sm font-semibold text-primary">Stage 3 of 12</span>
+<span class="font-label text-sm font-semibold text-secondary">V2 Stage</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-2">
+<div class="bg-secondary h-2 rounded-full" style="width: 25%"></div>
+</div>
+</div>
+</section>
+<!-- Timeline Overview (Horizontal Scroll) -->
+<section class="w-full overflow-x-auto no-scrollbar pb-6 pl-4 md:pl-10">
+<div class="flex gap-4 min-w-max items-center py-4">
+<!-- VE Stage (Completed) -->
+<div class="flex flex-col items-center gap-2 opacity-60">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed" data-icon="check">check</span>
+</div>
+<span class="font-label text-sm font-bold text-primary">VE</span>
+</div>
+<div class="w-8 h-1 bg-primary-fixed rounded-full"></div>
+<!-- V1 Stage (Completed) -->
+<div class="flex flex-col items-center gap-2 opacity-60">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed" data-icon="check">check</span>
+</div>
+<span class="font-label text-sm font-bold text-primary">V1</span>
+</div>
+<div class="w-8 h-1 bg-primary-fixed rounded-full"></div>
+<!-- V2 Stage (Current Active) -->
+<div class="flex flex-col items-center gap-2 transform scale-110 origin-bottom">
+<div class="w-16 h-16 rounded-full bg-secondary flex items-center justify-center shadow-[0_8px_32px_rgba(55,107,16,0.2)]">
+<span class="material-symbols-outlined text-on-secondary text-2xl" data-icon="local_florist">local_florist</span>
+</div>
+<span class="font-label text-sm font-bold text-secondary">V2</span>
+</div>
+<div class="w-8 h-1 bg-surface-container-high rounded-full"></div>
+<!-- V3 Stage (Upcoming) -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="eco">eco</span>
+</div>
+<span class="font-label text-sm font-bold text-on-surface-variant">V3</span>
+</div>
+<div class="w-8 h-1 bg-surface-container-high rounded-full"></div>
+<!-- V4 Stage (Upcoming) -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="eco">eco</span>
+</div>
+<span class="font-label text-sm font-bold text-on-surface-variant">V4</span>
+</div>
+<div class="w-8 h-1 bg-surface-container-high rounded-full"></div>
+<!-- V5 Stage (Upcoming) -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="eco">eco</span>
+</div>
+<span class="font-label text-sm font-bold text-on-surface-variant">V5</span>
+</div>
+</div>
+</section>
+<!-- Main Content Area: Bento Layout -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Left Column: Active Stage Details -->
+<div class="lg:col-span-2 flex flex-col gap-8">
+<!-- Highlighted Current Stage Card -->
+<div class="bg-surface-container-lowest rounded-lg p-8 shadow-[0_8px_32px_rgba(21,66,18,0.06)] relative overflow-hidden">
+<!-- Subtle background decoration -->
+<div class="absolute -right-20 -top-20 w-64 h-64 bg-secondary-container/20 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed" data-icon="local_florist">local_florist</span>
+</div>
+<div>
+<h3 class="font-headline text-2xl font-bold text-primary">Stage V2: Two Leaves</h3>
+<p class="font-body text-sm text-on-surface-variant">Plant height approx. 4-6 inches.</p>
+</div>
+</div>
+<p class="font-body text-on-surface mb-8 leading-relaxed">
+                            At the V2 stage, the plant has two collared leaves. The root system is expanding rapidly, and the growing point remains below the soil surface. This is a critical time for early weed control and ensuring adequate moisture.
+                        </p>
+<!-- Action Buttons -->
+<div class="flex flex-wrap gap-4 mb-8">
+<button class="bg-secondary text-on-secondary rounded font-label font-bold px-6 py-3 flex items-center gap-2 shadow-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined" data-icon="add_a_photo">add_a_photo</span>
+                                Upload Photos
+                            </button>
+<button class="bg-surface-container-low text-primary rounded font-label font-bold px-6 py-3 flex items-center gap-2 border border-outline-variant/15 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" data-icon="videocam">videocam</span>
+                                Add Videos
+                            </button>
+</div>
+<!-- Recent Uploads Preview (Glassmorphism hint) -->
+<div class="bg-surface/50 backdrop-blur-md rounded-lg p-4 border border-outline-variant/15 flex gap-4 overflow-x-auto">
+<div class="w-24 h-24 rounded-lg bg-surface-container-high shrink-0 overflow-hidden relative group">
+<img alt="Small corn sprout" class="w-full h-full object-cover" data-alt="close up of a vibrant green corn seedling emerging from dark rich soil under bright sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0OhNNRYn-V71K1I3aIB4vCgBvvyWeMmA4NT6M8IzkPYipZ656pm7e0P1FsWP1KpNSVPgk-HDzIF5wCptUVcScsMD05IbYl3mPz8feyBr3gWVNCVXcjuBVzyMVqI7em6CfVoVnzt3f88puogfHNqOZ-DnSv48T6NVM6us72wlZuBU-qzLYIDUNBsLakhAXgVA2SimIZI0IkrDJKhIE33MGY5l9C1Qab8Hb9N1Dm7K7yAB_wjgN2pZLJsRQwIktb9NjdT_QpsE1i2Ki"/>
+</div>
+<div class="w-24 h-24 rounded-lg bg-surface-container-high shrink-0 overflow-hidden flex items-center justify-center border border-dashed border-outline-variant text-outline cursor-pointer hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Checklist & Environment -->
+<div class="flex flex-col gap-8 pl-0 md:pl-8">
+<!-- Checklist Card -->
+<div class="bg-surface-container-low rounded-lg p-6">
+<h4 class="font-headline text-xl font-bold text-primary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="task_alt">task_alt</span>
+                        Required Tasks
+                    </h4>
+<ul class="flex flex-col gap-0">
+<!-- Task 1 (Completed) -->
+<li class="py-4 border-b border-surface-dim/30 flex items-start gap-3">
+<div class="mt-1 w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</div>
+<div>
+<p class="font-body font-semibold text-on-surface line-through opacity-70">Soil Moisture Check</p>
+<p class="font-body text-sm text-on-surface-variant">Completed 2 hrs ago</p>
+</div>
+</li>
+<!-- Task 2 (Pending) -->
+<li class="py-4 border-b border-surface-dim/30 flex items-start gap-3">
+<div class="mt-1 w-6 h-6 rounded-full border-2 border-outline flex items-center justify-center shrink-0"></div>
+<div>
+<p class="font-body font-semibold text-primary">Pest Scouting</p>
+<p class="font-body text-sm text-on-surface-variant">Look for early cutworm signs.</p>
+</div>
+</li>
+<!-- Task 3 (Pending) -->
+<li class="py-4 flex items-start gap-3">
+<div class="mt-1 w-6 h-6 rounded-full border-2 border-outline flex items-center justify-center shrink-0"></div>
+<div>
+<p class="font-body font-semibold text-primary">Weed Assessment</p>
+<p class="font-body text-sm text-on-surface-variant">Check row middles.</p>
+</div>
+</li>
+</ul>
+</div>
+<!-- AI Insight Card -->
+<div class="bg-surface-bright rounded-lg p-6 relative overflow-hidden">
+<!-- Subtle grain texture simulation -->
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');"></div>
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-secondary" data-icon="smart_toy">smart_toy</span>
+<span class="font-label text-xs font-bold uppercase tracking-wider text-secondary">AI Insight</span>
+</div>
+<p class="font-body text-on-surface-variant text-sm leading-relaxed">
+                            Based on local weather patterns (heavy rain expected tomorrow), prioritize the <strong class="text-primary">Weed Assessment</strong> today before field access becomes difficult.
+                        </p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md rounded-full bg-white/70 dark:bg-stone-900/70 backdrop-blur-xl no-line tonal transition shadow-[0_8px_32px_rgba(21,66,18,0.08)] z-50 flex justify-around items-center p-2 block md:hidden">
+<button class="flex flex-col items-center justify-center bg-[#2D5A27] text-[#b6f48a] rounded-full px-6 py-2 hover:opacity-75 transition-opacity active:scale-90 duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="agriculture" data-weight="fill" style="font-variation-settings: 'FILL' 1;">agriculture</span>
+<span class="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">Check-in</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#154212]/60 dark:text-stone-400 px-6 py-2 hover:bg-[#2D5A27]/10 dark:hover:bg-white/5 transition-colors active:scale-90 duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="history">history</span>
+<span class="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">Logs</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#154212]/60 dark:text-stone-400 px-6 py-2 hover:bg-[#2D5A27]/10 dark:hover:bg-white/5 transition-colors active:scale-90 duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="smart_toy">smart_toy</span>
+<span class="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">AI Assistant</span>
+</button>
+</nav>
+</body></html>

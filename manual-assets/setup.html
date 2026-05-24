@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1.0">
+<title>农场设置页</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #fbf9f5;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+.phone {
+  width: 390px;
+  height: 844px;
+  background: #fbf9f5;
+  border-radius: 40px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  overflow: hidden;
+  position: relative;
+}
+.container {
+  min-height: 100%;
+  background-color: #fbf9f5;
+  padding-bottom: 32px;
+  overflow-y: auto;
+}
+.content { padding: 24px 24px 0; }
+.header-image-wrapper {
+  width: 100%;
+  height: 120px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 16px rgba(21,66,18,0.08);
+  background: linear-gradient(135deg, #bcf0ae, #9bd771);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.header-image {
+  font-size: 48px;
+}
+.title-section { margin-bottom: 40px; }
+.headline {
+  display: block;
+  font-size: 28px;
+  font-weight: 800;
+  color: #154212;
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+.subtitle {
+  display: block;
+  font-size: 15px;
+  color: #42493e;
+  line-height: 1.5;
+  max-width: 85%;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #42493e;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-left: 4px;
+}
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.label-locked {
+  font-size: 10px;
+  color: #376B10;
+  font-weight: 600;
+  background-color: #bcf0ae;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.input {
+  background-color: #f5f3ef;
+  border-radius: 8px;
+  padding: 16px 20px;
+  font-size: 17px;
+  color: #1b1c1a;
+  border: none;
+  outline: none;
+  width: 100%;
+}
+.input-locked {
+  background-color: #eae8e4;
+  color: #42493e;
+  opacity: 0.85;
+}
+.placeholder { color: #c2c9bb; }
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: #f5f3ef;
+  border-radius: 8px;
+}
+.input-icon {
+  position: absolute;
+  left: 16px;
+  font-size: 16px;
+  z-index: 1;
+}
+.input-indent {
+  padding-left: 44px;
+  width: 100%;
+  background: transparent;
+}
+.input-with-suffix {
+  display: flex;
+  align-items: center;
+  background-color: #f5f3ef;
+  border-radius: 8px;
+  padding-right: 16px;
+}
+.input-flex {
+  flex: 1;
+  background: transparent;
+}
+.input-suffix {
+  font-size: 14px;
+  color: #42493e;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.select-wrapper {
+  background-color: #f5f3ef;
+  border-radius: 8px;
+}
+.picker {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.picker-text { font-size: 17px; color: #1b1c1a; }
+.picker-placeholder { color: #c2c9bb; }
+.picker-arrow { font-size: 20px; color: #72796e; }
+.action-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  padding-bottom: 24px;
+}
+.btn-submit {
+  flex: 1;
+  background: linear-gradient(135deg, #376B10, #9bd771);
+  color: #fff;
+  border-radius: 16px;
+  padding: 20px 16px;
+  font-size: 18px;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 4px 16px rgba(55,107,16,0.15);
+  text-align: center;
+}
+.btn-outline {
+  flex: 1;
+  background-color: transparent;
+  color: #376B10;
+  border-radius: 16px;
+  padding: 20px 16px;
+  font-size: 18px;
+  font-weight: 700;
+  border: 2px solid #376B10;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="container">
+    <div class="content">
+      <div class="header-image-wrapper">
+        <span class="header-image">🌱</span>
+      </div>
+      <div class="title-section">
+        <span class="headline">告诉我们您的农场信息</span>
+        <span class="subtitle">建立基础信息，为您定制种植方案。</span>
+      </div>
+      <div class="form">
+        <div class="form-group">
+          <div class="label-row">
+            <span class="label">姓名</span>
+          </div>
+          <input class="input" placeholder="例如：张三" value="">
+        </div>
+        <div class="form-group">
+          <div class="label-row">
+            <span class="label">电话号码</span>
+          </div>
+          <input class="input" placeholder="13800000000" value="">
+        </div>
+        <div class="form-group">
+          <span class="label">农场位置</span>
+          <div class="input-with-icon">
+            <span class="input-icon">📍</span>
+            <input class="input input-indent" placeholder="点击选择农场位置" value="">
+          </div>
+        </div>
+        <div class="form-group">
+          <span class="label">积温</span>
+          <div class="input-with-suffix">
+            <input class="input input-flex" placeholder="2800" value="">
+            <span class="input-suffix">℃</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <span class="label">土地类型</span>
+          <div class="select-wrapper">
+            <div class="picker">
+              <span class="picker-text picker-placeholder">选择土地类型...</span>
+              <span class="picker-arrow">⌄</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <span class="label">灌溉方式</span>
+          <div class="select-wrapper">
+            <div class="picker">
+              <span class="picker-text picker-placeholder">选择灌溉方式...</span>
+              <span class="picker-arrow">⌄</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <span class="label">种植密度</span>
+          <div class="input-with-suffix">
+            <input class="input input-flex" placeholder="6700" value="">
+            <span class="input-suffix">株/亩</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <span class="label">种子品种</span>
+          <div class="select-wrapper">
+            <div class="picker">
+              <span class="picker-text picker-placeholder">选择主栽品种...</span>
+              <span class="picker-arrow">⌄</span>
+            </div>
+          </div>
+        </div>
+        <div class="action-row">
+          <div class="btn-outline">← 返回</div>
+          <div class="btn-submit">完成设置 →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

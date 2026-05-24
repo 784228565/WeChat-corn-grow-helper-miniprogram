@@ -1,0 +1,9 @@
+{
+  "name": "taskManager",
+  "version": "1.0.0",
+  "description": "生长阶段与任务管理云函数：任务清单获取、状态切换、AI农事建议",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "^3.0.4"
+  }
+}
