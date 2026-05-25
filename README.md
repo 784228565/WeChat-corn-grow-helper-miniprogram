@@ -1,5 +1,7 @@
 # 农田管家 (The Living Ledger)
 
+[![English](https://img.shields.io/badge/English-README-blue)](./README_EN.md)
+
 一个基于微信小程序云开发的玉米种植管理助手，提供农场设置、生长阶段任务管理、打卡记录、AI 农事咨询等功能。
 
 ## 功能特性
@@ -120,6 +122,16 @@ cd the-living-ledger
 点击微信开发者工具的「编译」按钮，即可在模拟器中预览小程序。
 
 首次进入会自动触发静默登录，新用户将跳转农场设置页面。
+
+## 界面预览
+
+| 欢迎页 | 农场设置 | 今日打卡 |
+|--------|---------|---------|
+| ![欢迎页](./manual-assets/screenshot-welcome.png) | ![农场设置](./manual-assets/screenshot-setup.png) | ![今日打卡](./manual-assets/screenshot-checkin.png) |
+
+| 农场菜单 | 打卡记录 | AI 助手 |
+|----------|---------|--------|
+| ![农场菜单](./manual-assets/screenshot-farm-menu.png) | ![打卡记录](./manual-assets/screenshot-logs.png) | ![AI 助手](./manual-assets/screenshot-ai.png) |
 
 ## 项目结构
 
